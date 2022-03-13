@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": "dbarone-api"
+    },
+    {
+      "path": "dbarone-ui"
+    },
+    {
+      "path": "database"
+    },
+    {
+      "path": "resources"
+    },
+    {
+      "path": "."
+    }
+  ],
+  "settings": {}
+}
