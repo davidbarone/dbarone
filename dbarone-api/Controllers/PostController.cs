@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using dbarone_api.Models;
-using dbarone_api.Repository;
+using dbarone_api.Entities;
+using dbarone_api.Services;
 
 namespace dbarone_api.Controllers;
 
@@ -8,17 +8,17 @@ namespace dbarone_api.Controllers;
 [Route("[controller]")]
 public class PostController : ControllerBase
 {
-    private readonly IRepository _repository;
+    private readonly IDataService _dataService;
 
-    public PostController(IRepository repository)
+    public PostController(IDataService dataService)
     {
-        this._repository = repository;
+        this._dataService = dataService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PostInfo>>> GetPosts()
+    public ActionResult<IEnumerable<Post>> GetPosts()
     {
-        var companies = await _repository.GetPosts();
+        var companies = _dataService.GetPosts();
         return Ok(companies);
     }
 }

@@ -1,4 +1,4 @@
-namespace dbarone_api.Models;
+namespace dbarone_api.Entities;
 public class Comment
 {
     public int Id { get; set; }

@@ -24,6 +24,6 @@ api
 - CLI: dotnet new webapi -n dbarone-api
 - Storing database connection passwords: https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-6.0&tabs=windows
 - 
-  
+
 ui
 --

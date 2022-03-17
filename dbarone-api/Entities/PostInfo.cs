@@ -1,5 +1,5 @@
-namespace dbarone_api.Models;
-public class PostInfo
+namespace dbarone_api.Entities;
+public class Post
 {
     public int Id { get; set; }
     public string Title { get; set; }
