@@ -15,6 +15,7 @@ public interface IUserService
     AuthenticateResponse RefreshToken(string token, string ipAddress);
     void RevokeToken(string token, string ipAddress);
     IEnumerable<User> GetAll();
+    IEnumerable<RefreshToken> GetRefreshTokens(int? userId);
     User GetById(int id);
 }
 
@@ -39,7 +40,7 @@ public class UserService : IUserService
         var user = _dataService.GetUsers().FirstOrDefault(u => u.Username == model.Username);
 
         // validate
-        if (user == null || !BCrypt.Verify(model.Password, user.PasswordHash))
+        if (user == null || !BCrypt.Verify(model.Password, user.Hash))
             throw new AppException("Username or password is incorrect");
 
         // authentication successful so generate jwt and refresh tokens
@@ -52,7 +53,7 @@ public class UserService : IUserService
     public AuthenticateResponse RefreshToken(string token, string ipAddress)
     {
         var user = getUserByRefreshToken(token);
-        var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+        var refreshToken = GetRefreshTokens(user.Id).Single(x => x.Token == token);
 
         if (refreshToken.IsRevoked)
         {
@@ -65,7 +66,7 @@ public class UserService : IUserService
 
         // replace old refresh token with a new one (rotate token)
         var newRefreshToken = rotateRefreshToken(refreshToken, ipAddress);
-        _dataService.AddRefreshToken(user, refreshToken, _appSettings.RefreshTokenTTL);
+        _dataService.AddRefreshToken(user, newRefreshToken, _appSettings.RefreshTokenTTL);
 
         // generate new jwt
         var jwtToken = _jwtUtils.GenerateJwtToken(user);
@@ -76,13 +77,18 @@ public class UserService : IUserService
     public void RevokeToken(string token, string ipAddress)
     {
         var user = getUserByRefreshToken(token);
-        var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+        var refreshToken = GetRefreshTokens(user.Id).Single(x => x.Token == token);
 
         if (!refreshToken.IsActive)
             throw new AppException("Invalid token");
 
         // revoke token and save
         revokeRefreshToken(refreshToken, ipAddress, "Revoked without replacement");
+    }
+
+    public IEnumerable<RefreshToken> GetRefreshTokens(int? userId)
+    {
+        return _dataService.GetRefreshTokens(userId);
     }
 
     public User GetById(int id)
@@ -101,7 +107,7 @@ public class UserService : IUserService
 
     private User getUserByRefreshToken(string token)
     {
-        var user = GetAll().SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+        var user = GetAll().SingleOrDefault(u => GetRefreshTokens(u.Id).Any(t => t.Token == token));
 
         if (user == null)
             throw new AppException("Invalid token");
@@ -122,7 +128,7 @@ public class UserService : IUserService
         // recursively traverse the refresh token chain and ensure all descendants are revoked
         if (!string.IsNullOrEmpty(refreshToken.ReplacedByToken))
         {
-            var childToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken.ReplacedByToken);
+            var childToken = GetRefreshTokens(user.Id).SingleOrDefault(x => x.Token == refreshToken.ReplacedByToken);
             if (childToken.IsActive)
                 revokeRefreshToken(childToken, ipAddress, reason);
             else
@@ -136,6 +142,7 @@ public class UserService : IUserService
         token.RevokedByIp = ipAddress;
         token.ReasonRevoked = reason;
         token.ReplacedByToken = replacedByToken;
+        _dataService.UpdateRefreshToken(token.Id, token);
     }
 
     #endregion

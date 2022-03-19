@@ -3,6 +3,7 @@ using dbarone_api.Data;
 using dbarone_api.Authorization;
 using dbarone_api.Helpers;
 using System.Text.Json.Serialization;
+using dbarone_api.Models.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -28,6 +29,27 @@ var builder = WebApplication.CreateBuilder(args);
 }
 
 var app = builder.Build();
+
+// add hardcoded test user to db on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
+    var testUser = new UserModel
+    {
+        FirstName = "David",
+        LastName = "Barone",
+        Username = "dbarone",
+        Password = "dbarone",
+        Email = "davidbarone@live.com"
+    };
+
+    dataService.CreateUser(testUser);
+}
+
+
+
+
+
 
 {
     // Configure the HTTP request pipeline.

@@ -25,11 +25,11 @@ public class DapperContext
         db.Execute(sql, param);
     }
 
-    public IEnumerable<T>? Query<T>(string sql, object? param = null)
+    public IEnumerable<T> Query<T>(string sql, object? param = null)
     {
         // C# 8.0 implied using declarations
         using var db = this.CreateConnection();
         var items = db.Query<T>(sql, param);
-        return items;
+        return items ?? new List<T>();
     }
 }

@@ -66,8 +66,8 @@ public class UsersController : ControllerBase
     [HttpGet("{id}/refresh-tokens")]
     public IActionResult GetRefreshTokens(int id)
     {
-        var user = _userService.GetById(id);
-        return Ok(user.RefreshTokens);
+        var refreshTokens = _userService.GetRefreshTokens(id);
+        return Ok(refreshTokens);
     }
 
     // helper methods
