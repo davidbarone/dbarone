@@ -37,6 +37,7 @@ public interface IDataService
     public IEnumerable<Resource> GetResources();
     public Resource GetResource(int id);
     public Resource GetResourceByFilename(string filename);
+    public void DeleteResource(int id);
 
     #endregion
 }
@@ -202,6 +203,11 @@ SELECT * FROM [User] WHERE Id = @Id;", new
     }
 
     #region Resources
+
+    public void DeleteResource(int id)
+    {
+        _context.Execute(@"DELETE FROM Resource WHERE Id = @Id", new { Id = id });
+    }
 
     public IEnumerable<Resource> GetResources()
     {

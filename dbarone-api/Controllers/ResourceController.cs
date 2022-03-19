@@ -15,10 +15,16 @@ public class ResourceController : ControllerBase
         this._dataService = dataService;
     }
 
+    /// <summary>
+    /// Deletes a resource.
+    /// </summary>
+    /// <param name="id">The id of the resource to delete.</param>
+    /// <returns></returns>
     [HttpDelete("/resources/{id}")]
     public ActionResult DeleteResource(int id)
     {
-        return null;
+        _dataService.DeleteResource(id);
+        return Ok(new { message = $"Resource {id} successfully deleted." });
     }
 
     /// <summary>
@@ -48,6 +54,11 @@ public class ResourceController : ControllerBase
         return Ok(_dataService.GetResources());
     }
 
+    /// <summary>
+    /// Downloads a resource by id.
+    /// </summary>
+    /// <param name="id">The resource id.</param>
+    /// <returns>Downloaded resource file.</returns>
     [HttpGet("/resources/{id}")]
     public ActionResult<Resource> GetResource(int id)
     {
@@ -57,6 +68,11 @@ public class ResourceController : ControllerBase
         );
     }
 
+    /// <summary>
+    /// Downloads a resouce by filename.
+    /// </summary>
+    /// <param name="filename">The resource filename</param>
+    /// <returns>Downloaded resource file.</returns>
     [HttpGet("/static/{filename}")]
     public ActionResult<Resource> GetResourceByName(string filename)
     {
