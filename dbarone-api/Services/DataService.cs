@@ -11,14 +11,32 @@ public interface IDataService
     public void AddRefreshToken(User user, RefreshToken refreshToken, int refreshTokenTtlDays);
     public void UpdateRefreshToken(int refreshTokenId, RefreshToken refreshToken);
 
+    #region Posts
+
+    public Post? GetPost(int id);
+    public Post? GetPostParent(int id);
+    public IEnumerable<Post> GetPostSiblings(int id);
+    public IEnumerable<Post> GetPostChildren(int id);
+
+    #endregion
+
     #region Users
-    public User CreateUser(UserModel userModel);
+    public User CreateUser(UserRequest userRequest);
 
     #endregion
 
     #region Refresh Tokens
 
     public IEnumerable<RefreshToken> GetRefreshTokens(int? userId);
+
+    #endregion
+
+    #region Resources
+
+    public Resource CreateResource(string filename, string contentType, byte[] data);
+    public IEnumerable<Resource> GetResources();
+    public Resource GetResource(int id);
+    public Resource GetResourceByFilename(string filename);
 
     #endregion
 }
@@ -35,6 +53,39 @@ public class DataService : IDataService
     {
         var items = _context.Query<Post>("SELECT * FROM Post");
         return items ?? new List<Post>();
+    }
+
+    public Post? GetPost(int id)
+    {
+        var post = _context.Query<Post>("SELECT * FROM Post WHERE Id = @Id", new { Id = id }).FirstOrDefault();
+        return post;
+    }
+
+    public Post? GetPostParent(int id)
+    {
+        var post = GetPost(id);
+        if (post == null)
+            return null;
+
+        var parent = _context.Query<Post>("SELECT * FROM Post WHERE Id = @Id", new { Id = post.ParentId }).FirstOrDefault();
+        return parent;
+    }
+
+    public IEnumerable<Post> GetPostSiblings(int id)
+    {
+        var parent = GetPostParent(id);
+
+        if (parent == null)
+            return new List<Post>();
+
+        var siblings = _context.Query<Post>("SELECT * FROM Post WHERE ParentId = @ParentId AND Id <> @Id", new { ParentId = parent.Id, Id = id });
+        return siblings;
+    }
+
+    public IEnumerable<Post> GetPostChildren(int id)
+    {
+        var children = _context.Query<Post>("SELECT * FROM Post WHERE ParentId = @ParentId", new { ParentId = id });
+        return children;
     }
 
     public IEnumerable<User> GetUsers()
@@ -112,12 +163,12 @@ DELETE FROM RefreshToken WHERE UserId = @UserId AND Created < DATEADD(dd, @TtlDa
     /// </summary>
     /// <param name="userModel"></param>
     /// <returns></returns>
-    public User CreateUser(UserModel userModel)
+    public User CreateUser(UserRequest userRequest)
     {
 
         var now = DateTime.Now;
         var systemUser = "system";
-        var hash = BCrypt.Net.BCrypt.HashPassword(userModel.Password);
+        var hash = BCrypt.Net.BCrypt.HashPassword(userRequest.Password);
 
         var user = _context.Query<User>(@"
 
@@ -135,11 +186,11 @@ INSERT INTO [User] (
 -- Return new user
 SELECT * FROM [User] WHERE Id = @Id;", new
         {
-            Username = userModel.Username,
+            Username = userRequest.Username,
             Hash = hash,
-            Firstname = userModel.FirstName,
-            Lastname = userModel.LastName,
-            Email = userModel.Email,
+            Firstname = userRequest.FirstName,
+            Lastname = userRequest.LastName,
+            Email = userRequest.Email,
             Status = "P",       // published
             CreatedDt = now,
             CreatedBy = systemUser,
@@ -149,4 +200,56 @@ SELECT * FROM [User] WHERE Id = @Id;", new
 
         return user;
     }
+
+    #region Resources
+
+    public IEnumerable<Resource> GetResources()
+    {
+        var resources = _context.Query<Resource>(@"SELECT * FROM Resource");
+        return resources;
+    }
+
+    public Resource GetResource(int id)
+    {
+        var resource = _context.Query<Resource>(@"SELECT * FROM Resource WHERE Id = @Id", new { Id = id }).FirstOrDefault();
+        return resource;
+    }
+
+    public Resource GetResourceByFilename(string filename)
+    {
+        var resource = _context.Query<Resource>(@"SELECT * FROM Resource WHERE Filename = @Filename", new { Filename = filename }).FirstOrDefault();
+        return resource;
+    }
+
+    public Resource CreateResource(string filename, string contentType, byte[] data)
+    {
+        var resource = _context.Query<Resource>(@"
+DECLARE @Id INT;
+SELECT @Id = NEXT VALUE FOR ResourceSeq;
+
+DELETE FROM
+    [Resource]
+WHERE
+    Filename = @Filename;
+
+INSERT INTO
+    Resource (Id, Filename, Data, ContentType, Status, CreatedDt, CreatedBy)
+SELECT
+    @Id, @Filename, @Data, @ContentType, @Status, @CreatedDt, @CreatedBy;
+
+SELECT * FROM [Resource] WHERE Id = @Id
+    ", new
+        {
+            Filename = filename,
+            Data = data,
+            ContentType = contentType,
+            Status = 'P',
+            CreatedDt = DateTime.Now,
+            CreatedBy = "system"
+        }).First();
+
+        return resource;
+    }
+
+    #endregion
 }

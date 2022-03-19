@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>dbarone_api</RootNamespace>
     <UserSecretsId>962ee5ed-9911-42bb-8b2a-6fc791c9163f</UserSecretsId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

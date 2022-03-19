@@ -1,6 +1,6 @@
 namespace dbarone_api.Models.Users;
 
-public class UserModel
+public class UserRequest
 {
     public int? Id { get; set; }
     public string FirstName { get; set; } = default!;

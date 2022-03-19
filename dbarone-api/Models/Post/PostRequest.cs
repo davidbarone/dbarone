@@ -1,8 +1,11 @@
-namespace dbarone_api.Entities;
+namespace dbarone_api.Models;
 
-public class Post
+/// <summary>
+/// Post model used in requests (creating and updating posts)
+/// </summary>
+public class PostRequest
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string Title { get; set; }
     public string Slug { get; set; }
     public string Teaser { get; set; }
@@ -12,10 +15,4 @@ public class Post
     public string Head { get; set; }
     public string PostType { get; set; }
     public int? ParentId { get; set; }
-    public DateTime CreatedDt { get; set; }
-    public string CreatedBy { get; set; }
-    public DateTime UpdatedDt { get; set; }
-    public string UpdatedBy { get; set; }
-
-    public bool IsChild => this.ParentId != null;
 }
