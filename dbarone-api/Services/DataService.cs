@@ -14,6 +14,7 @@ public interface IDataService
     #region Posts
 
     public Post? GetPost(int id);
+    public Post? GetPostBySlug(string slug);
     public Post? GetPostParent(int id);
     public IEnumerable<Post> GetPostSiblings(int id);
     public IEnumerable<Post> GetPostChildren(int id);
@@ -59,6 +60,12 @@ public class DataService : IDataService
     public Post? GetPost(int id)
     {
         var post = _context.Query<Post>("SELECT * FROM Post WHERE Id = @Id", new { Id = id }).FirstOrDefault();
+        return post;
+    }
+
+    public Post? GetPostBySlug(string slug)
+    {
+        var post = _context.Query<Post>("SELECT * FROM Post WHERE Slug = @Slug", new { Slug = slug }).FirstOrDefault();
         return post;
     }
 

@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using dbarone_api.Entities;
 using dbarone_api.Services;
+using dbarone_api.Authorization;
+using dbarone_api.Lib.ObjectMapper;
+using dbarone_api.Models;
 
 namespace dbarone_api.Controllers;
 
@@ -28,25 +31,29 @@ public class PostController : ControllerBase
     /// <param name="includeChildren">If set to true, child posts are included in the result.</param>
     /// <returns>A set of posts.</returns>
     [HttpGet("posts")]
-    public ActionResult<IEnumerable<Post>> GetPosts(bool includeChildren = false)
+    public ActionResult<IEnumerable<PostSummaryResponse>> GetPosts(bool includeChildren = false)
     {
-        var companies = _dataService.GetPosts().Where(p => !p.IsChild || includeChildren);
+        var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
+        var companies = mapper.MapMany(_dataService.GetPosts().Where(p => !p.IsChild || includeChildren));
         return Ok(companies);
     }
 
     [HttpPost("posts")]
+    [Authorize]
     public ActionResult<Post> CreatePost(Post post)
     {
         return null;
     }
 
     [HttpPut("posts/{id}")]
+    [Authorize]
     public ActionResult UpdatePost(int id, [FromBody] Post post)
     {
         return null;
     }
 
     [HttpDelete("posts/{id}")]
+    [Authorize]
     public ActionResult DeletePost(int id)
     {
         return null;
@@ -58,14 +65,22 @@ public class PostController : ControllerBase
         return Ok(_dataService.GetPost(id));
     }
 
+    [HttpGet("/{slug}")]
+    public ActionResult<Post> GetPostBySlug(string slug)
+    {
+        return Ok(_dataService.GetPostBySlug(slug));
+    }
+
     [HttpGet("posts/related/{id}")]
     public ActionResult<RelatedPostResponse> GetRelatedPosts(int id)
     {
+        var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
+
         return Ok(new RelatedPostResponse
         {
-            Parent = _dataService.GetPostParent(id),
-            Siblings = _dataService.GetPostSiblings(id),
-            Children = _dataService.GetPostChildren(id)
+            Parent = mapper.MapOne(_dataService.GetPostParent(id)),
+            Siblings = mapper.MapMany(_dataService.GetPostSiblings(id)),
+            Children = mapper.MapMany(_dataService.GetPostChildren(id))
         });
     }
 }
