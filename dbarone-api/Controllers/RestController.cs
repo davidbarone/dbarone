@@ -6,31 +6,6 @@ using System.Linq;
 
 public class RestController : ControllerBase
 {
-    /// <summary>
-    /// Creates a response standard envelope that implements HATEOAS.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="data"></param>
-    /// <param name="e"></param>
-    /// <param name="messages"></param>
-    /// <param name="links"></param>
-    /// <returns></returns>
-    protected ResponseEnvelope<T> CreateResponseEnvelope<T>(T data, Exception? e = null, IEnumerable<ResponseMessage>? messages = null, IList<ResponseLink>? links = null)
-    {
-        return new ResponseEnvelope<T>
-        {
-            Status = new ResponseStatus
-            {
-                Success = (e == null) ? true : false,
-                Message = e?.Message ?? ""
-            },
-            Data = data,
-            Messages = messages!,
-            Links = links!
-        };
-    }
-
-    /// <summary>
     /// Pagination result structure
     /// </summary>
     /// <typeparam name="T"></typeparam>

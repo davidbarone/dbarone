@@ -7,34 +7,22 @@ using dbarone_api.Extensions;
 public static class ValidationManager
 {
     /// <summary>
-    /// Tests the validity of an object. If not valid, throws an exception.
+    /// Validates an object. Throws an exception if not valid.
     /// </summary>
     /// <param name="target"></param>
-    /// <param name="resultType"></param>
-    public static void AssertValidity(object target, ValidationResultType resultType)
+    public static void Validate(object target)
     {
-        var results = Validate(target, resultType);
+        var results = GetValidationResults(target);
         if (results.Any())
             throw new ValidationException(results);
     }
 
     /// <summary>
-    /// Tests the validity of an object. If not valid, throws an exception.
+    /// Gets the validations results for an object. Does not throw an exception.
     /// </summary>
     /// <param name="target"></param>
-    public static void AssertValidity(object target)
-    {
-        var results = Validate(target);
-        if (results.Any())
-            throw new ValidationException(results);
-    }
-
-    public static IEnumerable<ValidationResult> Validate(object target, ValidationResultType resultType)
-    {
-        return Validate(target).Where(r => (resultType & r.ResultType) == r.ResultType);
-    }
-
-    public static IEnumerable<ValidationResult> Validate(object target)
+    /// <returns></returns>
+    public static IEnumerable<ValidationResult> GetValidationResults(object target)
     {
         var props = target.GetPropertiesDecoratedBy<ValidatorAttribute>();
         List<ValidationResult> results = new List<ValidationResult>();

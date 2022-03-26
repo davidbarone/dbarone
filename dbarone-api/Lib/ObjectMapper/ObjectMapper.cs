@@ -8,16 +8,21 @@ public class ObjectMapper<T, U> where T : class where U : class
     IList<PropertyMap> _map;
     IMapperStrategy _mapperStrategy = new NameMapperStrategy();
 
-    internal ObjectMapper()
+    internal ObjectMapper(IMapperStrategy mapperStrategy = null)
     {
+        if (mapperStrategy == null)
+        {
+            mapperStrategy = new NameMapperStrategy();
+        }
+        _mapperStrategy = mapperStrategy;
         this._from = typeof(T);
         this._to = typeof(U);
         this._map = this._mapperStrategy.MapTypes(this._from, this._to);
     }
 
-    public static ObjectMapper<T, U> Create()
+    public static ObjectMapper<T, U> Create(IMapperStrategy mapperStrategy = null)
     {
-        return new ObjectMapper<T, U>();
+        return new ObjectMapper<T, U>(mapperStrategy);
     }
 
     public U? MapOne(T? obj)

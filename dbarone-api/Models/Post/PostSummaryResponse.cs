@@ -1,4 +1,4 @@
-namespace dbarone_api.Models;
+namespace dbarone_api.Models.Post;
 
 /// <summary>
 /// Post model used in requests (creating and updating posts)

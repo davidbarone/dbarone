@@ -1,4 +1,4 @@
-namespace dbarone_api.Models;
+namespace dbarone_api.Models.Post;
 
 using dbarone_api.Entities;
 

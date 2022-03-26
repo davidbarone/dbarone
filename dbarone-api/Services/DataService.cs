@@ -3,21 +3,22 @@ using Dapper;
 using dbarone_api.Entities;
 using dbarone_api.Data;
 using dbarone_api.Models.Users;
+using dbarone_api.Models.Post;
 
 public interface IDataService
 {
-    public IEnumerable<Post> GetPosts();
     public IEnumerable<User> GetUsers();
     public void AddRefreshToken(User user, RefreshToken refreshToken, int refreshTokenTtlDays);
     public void UpdateRefreshToken(int refreshTokenId, RefreshToken refreshToken);
 
     #region Posts
-
+    public IEnumerable<Post> GetPosts();
     public Post? GetPost(int id);
     public Post? GetPostBySlug(string slug);
     public Post? GetPostParent(int id);
     public IEnumerable<Post> GetPostSiblings(int id);
     public IEnumerable<Post> GetPostChildren(int id);
+    public Post CreatePost(PostRequest post);
 
     #endregion
 
@@ -55,6 +56,44 @@ public class DataService : IDataService
     {
         var items = _context.Query<Post>("SELECT * FROM Post");
         return items ?? new List<Post>();
+    }
+
+    /// <summary>
+    /// Creates a new post.
+    /// </summary>
+    /// <param name="post">Post to create.</param>
+    /// <returns></returns>
+    public Post CreatePost(PostRequest post)
+    {
+        var now = DateTime.Now;
+
+        var newPost = _context.Query<Post>(@"
+DECLARE @Id INT
+SELECT @Id = NEXT VALUE FOR PostSeq
+
+INSERT INTO Post (
+    [Id], [Title], [Slug], [Teaser], [Content], [Code], [Style], [Head], [PostType], [ParentId], [CreatedDt], [CreatedBy], [UpdatedDt], [UpdatedBy]
+)
+SELECT
+    @Id, @Title, @Slug, @Teaser, @Content, @Code, @Style, @Head, @PostType, @ParentId, @CreatedDt, @CreatedBy, @UpdatedDt, @UpdatedBy;
+
+SELECT * FROM Post WHERE Id = @Id;", new
+        {
+            Title = post.Title,
+            Slug = post.Slug,
+            Teaser = post.Teaser,
+            Content = post.Content,
+            Code = post.Code,
+            Style = post.Style,
+            Head = post.Head,
+            PostType = post.PostType,
+            ParentId = post.ParentId,
+            CreatedDt = now,
+            CreatedBy = "system",
+            UpdatedDt = now,
+            UpdatedBy = "system"
+        }).First();
+        return newPost;
     }
 
     public Post? GetPost(int id)

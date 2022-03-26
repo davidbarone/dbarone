@@ -1,12 +1,12 @@
+namespace dbarone_api.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using dbarone_api.Entities;
 using dbarone_api.Services;
 using dbarone_api.Authorization;
 using dbarone_api.Lib.ObjectMapper;
-using dbarone_api.Models;
+using dbarone_api.Models.Post;
 using dbarone_api.Models.Response;
-
-namespace dbarone_api.Controllers;
+using dbarone_api.Extensions;
 
 /// <summary>
 /// Services for posts.
@@ -43,17 +43,28 @@ public class PostController : RestController
         var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
         var posts = mapper.MapMany(_dataService.GetPosts().Where(p => !p.IsChild || includeChildren));
         var paginationResult = GetPaginationResult("Post", "GetPosts", posts, pageSize, page);
-        return Ok(this.CreateResponseEnvelope<IEnumerable<PostSummaryResponse>>(paginationResult.Page, null, null, paginationResult.Links));
+        return Ok(ResponseEnvelope<IEnumerable<PostSummaryResponse>>.Create(paginationResult.Page, null, null, paginationResult.Links));
     }
 
+    /// <summary>
+    /// Creates a new post.
+    /// </summary>
+    /// <param name="post">The post to create.</param>
+    /// <returns></returns>
     [HttpPost("/posts")]
-    [Authorize]
     public ActionResult<Post> CreatePost(PostRequest post)
     {
-
-        return null;
+        post.Validate();
+        var createdPost = _dataService.CreatePost(post);
+        return Ok(ResponseEnvelope<Post>.Create(createdPost, null, null));
     }
 
+    /// <summary>
+    /// Updates an existing post.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="post"></param>
+    /// <returns></returns>
     [HttpPut("/posts/{id}")]
     [Authorize]
     public ActionResult UpdatePost(int id, [FromBody] Post post)
@@ -61,6 +72,11 @@ public class PostController : RestController
         return null;
     }
 
+    /// <summary>
+    /// Deletes an existing post.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("/posts/{id}")]
     [Authorize]
     public ActionResult DeletePost(int id)
@@ -68,18 +84,33 @@ public class PostController : RestController
         return null;
     }
 
+    /// <summary>
+    /// Gets a post by id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("/posts/{id}")]
     public ActionResult<Post> GetPost(int id)
     {
         return Ok(_dataService.GetPost(id));
     }
 
+    /// <summary>
+    /// Gets a post by slug.
+    /// </summary>
+    /// <param name="slug"></param>
+    /// <returns></returns>
     [HttpGet("/{slug}")]
     public ActionResult<Post> GetPostBySlug(string slug)
     {
         return Ok(_dataService.GetPostBySlug(slug));
     }
 
+    /// <summary>
+    /// Gets the related posts.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("/posts/related/{id}")]
     public ActionResult<RelatedPostResponse> GetRelatedPosts(int id)
     {

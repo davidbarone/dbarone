@@ -10,7 +10,7 @@ public class ObjectValidator : ValidatorAttribute
 {
     public override void DoValidate(object value, object target, string key, IList<ValidationResult> results)
     {
-        var childResults = ValidationManager.Validate(value);
+        var childResults = ValidationManager.GetValidationResults(value);
         foreach (var childResult in childResults)
         {
             childResult.Key = key + "." + childResult.Key;
