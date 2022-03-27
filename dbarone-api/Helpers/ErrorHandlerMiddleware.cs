@@ -24,12 +24,11 @@ public class ErrorHandlerMiddleware
         {
             var response = context.Response;
             response.ContentType = "application/json";
-            ResponseEnvelope<object> envelope = ResponseEnvelope<object>.Create(null, error, null, null);
+            ResponseEnvelope<object> envelope = ResponseEnvelope<object>.Create(error);
 
             switch (error)
             {
                 case ValidationException e:
-                    envelope = ResponseEnvelope<object>.Create(null, e, null, null);
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 case AppException e:
@@ -39,6 +38,9 @@ public class ErrorHandlerMiddleware
                 case KeyNotFoundException e:
                     // not found error
                     response.StatusCode = (int)HttpStatusCode.NotFound;
+                    break;
+                case InvalidDataException e:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 default:
                     // unhandled error

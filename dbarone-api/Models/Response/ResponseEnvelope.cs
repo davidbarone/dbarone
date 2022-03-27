@@ -10,34 +10,39 @@ public class ResponseEnvelope<T>
     public ResponseStatus Status { get; set; }
     public T? Data { get; set; }
     public IEnumerable<ResponseMessage> Messages { get; set; }
-    public IList<ResponseLink> Links { get; set; }
 
     /// <summary>
-    /// Factory method.
+    /// Fluent syntax for adding messages to existing ResponseEnvelope.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="data"></param>
-    /// <param name="e"></param>
     /// <param name="messages"></param>
-    /// <param name="links"></param>
     /// <returns></returns>
-    public static ResponseEnvelope<T> Create(T? data = default, Exception? e = null, IEnumerable<ResponseMessage>? messages = null, IList<ResponseLink>? links = null)
+    public ResponseEnvelope<T> AddMessages(IEnumerable<ResponseMessage> messages)
+    {
+        if (this.Messages == null)
+        {
+            this.Messages = new List<ResponseMessage>();
+        }
+        this.Messages = this.Messages.Union(messages);
+        return this;
+    }
+
+    /// <summary>
+    /// Create a response envelope from an exception.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    public static ResponseEnvelope<T> Create(Exception e)
     {
         var validationException = e as ValidationException;
         if (validationException != null)
         {
-            if (messages == null)
-            {
-                messages = new List<ResponseMessage>();
-            }
             // Map validation results to response messages
             var mapper = ObjectMapper<ValidationResult, ResponseMessage>.Create(
                 new CustomMapperStrategy<ValidationResult, ResponseMessage>()
-                .Rule(from => from.Key, to => to.Source)
-                .Rule(from => from.Message, to => to.Message));
+                .Configure(from => from.Key, to => to.Source)
+                .Configure(from => from.Message, to => to.Message));
 
             var validationMessages = mapper.MapMany(validationException.Results);
-            messages = messages.Union(validationMessages);
             return new ResponseEnvelope<T>
             {
                 Status = new ResponseStatus
@@ -46,23 +51,42 @@ public class ResponseEnvelope<T>
                     Message = validationException.Message
                 },
                 Data = default,
-                Messages = messages,
-                Links = links!
+                Messages = validationMessages
             };
         }
         else
         {
+            // other exception
             return new ResponseEnvelope<T>
             {
                 Status = new ResponseStatus
                 {
-                    Success = (e == null) ? true : false,
-                    Message = e?.Message ?? ""
+                    Success = false,
+                    Message = e.Message
                 },
-                Data = data,
-                Messages = messages!,
-                Links = links!
+                Data = default,
+                Messages = new List<ResponseMessage> { { ResponseMessage.CreateError(e.Message) } }
             };
         }
+    }
+
+    /// <summary>
+    /// Factory method.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="data"></param>
+    /// <param name="messages"></param>
+    /// <returns></returns>
+    public static ResponseEnvelope<T> Create(T? data = default)
+    {
+        return new ResponseEnvelope<T>
+        {
+            Status = new ResponseStatus
+            {
+                Success = true,
+                Message = ""
+            },
+            Data = data
+        };
     }
 }

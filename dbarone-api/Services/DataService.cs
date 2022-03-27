@@ -19,6 +19,7 @@ public interface IDataService
     public IEnumerable<Post> GetPostSiblings(int id);
     public IEnumerable<Post> GetPostChildren(int id);
     public Post CreatePost(PostRequest post);
+    public Post? UpdatePost(int id, PostRequest post);
 
     #endregion
 
@@ -56,6 +57,48 @@ public class DataService : IDataService
     {
         var items = _context.Query<Post>("SELECT * FROM Post");
         return items ?? new List<Post>();
+    }
+
+    public Post? UpdatePost(int id, PostRequest post)
+    {
+        var now = DateTime.Now;
+
+        var updatedPost = _context.Query<Post>(@"
+UPDATE Post SET
+    Title = @Title,
+    Slug = @Slug,
+    Teaser = @Teaser,
+    Content = @Content,
+    Code = @Code,
+    Style = @Style,
+    Head = @Head,
+    PostType = @PostType,
+    ParentId = @ParentId,
+    UpdatedDt = @UpdatedDt,
+    UpdatedBy = @UpdatedBy
+WHERE
+    Id = @Id;
+
+SELECT * FROM Post WHERE Id = @Id;", new
+        {
+            Id = id,
+            Title = post.Title,
+            Slug = post.Slug,
+            Teaser = post.Teaser,
+            Content = post.Content,
+            Code = post.Code,
+            Style = post.Style,
+            Head = post.Head,
+            PostType = post.PostType,
+            ParentId = post.ParentId,
+            UpdatedDt = now,
+            UpdatedBy = "system"
+        }).FirstOrDefault();
+        if (updatedPost == null)
+        {
+            throw new KeyNotFoundException($"Post {id} not found.");
+        }
+        return updatedPost;
     }
 
     /// <summary>

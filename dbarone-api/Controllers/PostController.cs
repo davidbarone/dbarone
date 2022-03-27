@@ -42,8 +42,8 @@ public class PostController : RestController
         if (page < 1) page = 1;
         var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
         var posts = mapper.MapMany(_dataService.GetPosts().Where(p => !p.IsChild || includeChildren));
-        var paginationResult = GetPaginationResult("Post", "GetPosts", posts, pageSize, page);
-        return Ok(ResponseEnvelope<IEnumerable<PostSummaryResponse>>.Create(paginationResult.Page, null, null, paginationResult.Links));
+        var linkedPage = posts.ToLinkedPaginatedResource(Url, this.GetPosts, pageSize, page);
+        return Ok(linkedPage.ToResponseEnvelope());
     }
 
     /// <summary>
@@ -52,11 +52,16 @@ public class PostController : RestController
     /// <param name="post">The post to create.</param>
     /// <returns></returns>
     [HttpPost("/posts")]
-    public ActionResult<Post> CreatePost(PostRequest post)
+    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> CreatePost(PostRequest post)
     {
         post.Validate();
         var createdPost = _dataService.CreatePost(post);
-        return Ok(ResponseEnvelope<Post>.Create(createdPost, null, null));
+
+        // Links
+        List<Link> links = new();
+        links.Add(Url.GetLink("self", this.GetPost, new { id = createdPost.Id }));
+        var linkedPost = createdPost.ToLinkedResource(links);
+        return Ok(linkedPost.ToResponseEnvelope());
     }
 
     /// <summary>
@@ -66,10 +71,20 @@ public class PostController : RestController
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPut("/posts/{id}")]
-    [Authorize]
-    public ActionResult UpdatePost(int id, [FromBody] Post post)
+    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> UpdatePost(int id, [FromBody] PostRequest post)
     {
-        return null;
+        post.Validate();
+        if (id != post.Id)
+        {
+            throw new InvalidDataException($"Id {id} does not match resource id {post.Id}.");
+        }
+        var createdPost = _dataService.UpdatePost(id, post);
+
+        var linkedPost = createdPost.ToLinkedResource(new Link[]
+        {
+            Url.GetLink("self", this.GetPost, new { id = createdPost.Id })
+        });
+        return Ok(linkedPost.ToResponseEnvelope());
     }
 
     /// <summary>
@@ -92,7 +107,17 @@ public class PostController : RestController
     [HttpGet("/posts/{id}")]
     public ActionResult<Post> GetPost(int id)
     {
-        return Ok(_dataService.GetPost(id));
+        var post = _dataService.GetPost(id);
+        if (post == null)
+        {
+            throw new KeyNotFoundException($"Post {id} not found.");
+        }
+
+        var linkedPost = post.ToLinkedResource(new Link[] {
+            Url.GetLink("Update", this.UpdatePost, new { id = id }),
+            Url.GetLink("Delete", this.DeletePost, new { id = id })
+        });
+        return Ok(linkedPost.ToResponseEnvelope());
     }
 
     /// <summary>

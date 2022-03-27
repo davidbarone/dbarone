@@ -4,24 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections;
 using System.Linq;
 
+public class LinksDictionaryKey
+{
+    public string Route { get; set; }
+    public string HttpVerb { get; set; }
+}
+
+
 public class RestController : ControllerBase
 {
-    /// Pagination result structure
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class PaginationResult<T>
-    {
-        /// <summary>
-        /// The selected page of data
-        /// </summary>
-        public IEnumerable<T> Page { get; set; }
-        /// <summary>
-        /// REST links
-        /// </summary>
-        public IList<ResponseLink>? Links { get; set; }
-    }
+    public IDictionary<LinksDictionaryKey, Link> Links { get; init; }
 
-    protected PaginationResult<T> GetPaginationResult<T>(string controller, string action, IEnumerable<T> data, int pageSize, int page)
+    protected LinkedResource<IEnumerable<T>> GetPaginationResult<T>(string controller, string action, IEnumerable<T> data, int pageSize, int page)
     {
         double rowCount = data.Count();
         int lastPage = (int)Math.Ceiling(rowCount / pageSize);
@@ -34,16 +28,14 @@ public class RestController : ControllerBase
         var next = (page < lastPage) ? Url.Action(action, controller, new { pageSize = pageSize, page = page + 1 }) : null;
 
         var pagedData = data.Skip((page - 1) * pageSize).Take(pageSize);
+        var links = (lastPage > 1) ? new List<Link> {
+                new Link("first", first),
+                new Link("previous", previous),
+                new Link("next", next),
+                new Link("last", last)
+            }.Where(l => !string.IsNullOrEmpty(l.Uri)).ToList() : null;
 
-        return new PaginationResult<T>
-        {
-            Page = pagedData,
-            Links = (lastPage > 1) ? new List<ResponseLink> {
-                new ResponseLink{ Rel = "first", Uri = first},
-                new ResponseLink{ Rel = "previous", Uri = previous},
-                new ResponseLink{ Rel = "next", Uri = next},
-                new ResponseLink{ Rel = "last", Uri = last}
-            }.Where(l => !string.IsNullOrEmpty(l.Uri)).ToList() : null
-        };
+        LinkedResource<IEnumerable<T>> results = new LinkedResource<IEnumerable<T>>(pagedData, links);
+        return results;
     }
 }

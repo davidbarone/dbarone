@@ -9,7 +9,7 @@ public class CustomMapperStrategy<T, U> : IMapperStrategy
 {
     Dictionary<Expression<Func<T, object>>, Expression<Func<U, object>>> _customMappingRules = new();
 
-    public CustomMapperStrategy<T, U> Rule(Expression<Func<T, object>> from, Expression<Func<U, object>> to)
+    public CustomMapperStrategy<T, U> Configure(Expression<Func<T, object>> from, Expression<Func<U, object>> to)
     {
         _customMappingRules.Add(from, to);
         return this;
