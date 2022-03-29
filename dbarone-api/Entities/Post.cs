@@ -1,6 +1,7 @@
 namespace dbarone_api.Entities;
+using dbarone_api.Lib.Data;
 
-public class Post
+public class Post : IEntity
 {
     public int Id { get; set; }
     public string Title { get; set; }

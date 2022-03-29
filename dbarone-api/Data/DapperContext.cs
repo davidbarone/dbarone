@@ -17,7 +17,6 @@ public class DapperContext
     public IDbConnection CreateConnection()
         => new SqlConnection(_connectionString);
 
-
     public void Execute(string sql, object? param = null)
     {
         // C# 8.0 implied using declarations
