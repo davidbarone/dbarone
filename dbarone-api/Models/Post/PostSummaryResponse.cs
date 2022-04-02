@@ -5,8 +5,23 @@ namespace dbarone_api.Models.Post;
 /// </summary>
 public class PostSummaryResponse
 {
+    /// <summary>
+    /// Primary key for post.
+    /// </summary>
     public int Id { get; set; }
-    public string Title { get; set; }
-    public string Slug { get; set; }
-    public string Teaser { get; set; }
+
+    /// <summary>
+    /// Post title.
+    /// </summary>
+    public string Title { get; set; } = default!;
+
+    /// <summary>
+    /// Optional slug used for post.
+    /// </summary>
+    public string? Slug { get; set; }
+
+    /// <summary>
+    /// Short text for the post.
+    /// </summary>
+    public string? Teaser { get; set; }
 }
