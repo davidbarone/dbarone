@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
     var env = builder.Environment;
 
     // configure DI for application services
-    services.AddSingleton<DapperContext>();
+    services.AddSingleton<IDataContext, DataContext>();
     services.AddScoped<IDataService, DataService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IJwtUtils, JwtUtils>();

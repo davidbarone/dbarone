@@ -15,12 +15,12 @@ public static class HateoasExtensions
     /// <param name="resource"></param>
     /// <param name="links"></param>
     /// <returns></returns>
-    public static LinkedResource<T> ToLinkedResource<T>(this T resource, IEnumerable<Link> links)
+    public static LinkedResource<T?> ToLinkedResource<T>(this T? resource, IEnumerable<Link> links)
     {
         return LinkedResource<T>.Create(resource, links);
     }
 
-    public static ResponseEnvelope<T> ToResponseEnvelope<T>(this T resource)
+    public static ResponseEnvelope<T?> ToResponseEnvelope<T>(this T? resource)
     {
         return ResponseEnvelope<T>.Create(resource);
     }
@@ -32,7 +32,7 @@ public static class HateoasExtensions
     /// <param name=""></param>
     /// <param name=""></param>
     /// <returns></returns>
-    public static Link GetLink(this IUrlHelper helper, string rel, Delegate method, object values, string? title = null)
+    public static Link GetLink(this IUrlHelper helper, string rel, Delegate method, object? values = null, string? title = null)
     {
         Dictionary<Type, HttpVerb> HttpVerbs = new Dictionary<Type, HttpVerb>();
         HttpVerbs.Add(typeof(HttpGetAttribute), HttpVerb.GET);

@@ -129,4 +129,9 @@ public static class ReflectionExtensions
         }
         return types;
     }
+
+    public static bool IsIndexerProperty(this PropertyInfo prop)
+    {
+        return prop.GetIndexParameters().Length > 0;
+    }
 }

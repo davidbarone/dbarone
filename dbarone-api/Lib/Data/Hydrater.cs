@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using dbarone_api.Extensions;
 
 public class Hydrater
 {
@@ -19,19 +20,19 @@ public class Hydrater
         return values;
     }
 
-    public T GetEntity<T>(IDataReader reader) where T : IEntity
+    public T GetEntity<T>(IDataReader reader)
     {
         return CreateEntityFromValues<T>(GetHashTable(reader));
     }
 
-    private T CreateEntityFromValues<T>(Hashtable values) where T : IEntity
+    private T CreateEntityFromValues<T>(Hashtable values)
     {
         var entity = Activator.CreateInstance<T>();
         Hydrate(entity, values);
         return entity;
     }
 
-    private void Hydrate<T>(T entity, Hashtable values) where T : IEntity
+    private void Hydrate<T>(T entity, Hashtable values)
     {
         var tableInfo = MetaDataStore.GetTableInfoFor<T>();
 
@@ -51,7 +52,15 @@ public class Hydrater
                     {
                         value = Enum.Parse(propertyInfo.PropertyType, value.ToString());
                     }
-
+                    if (value != null)
+                    {
+                        var pt = propertyInfo.PropertyType;
+                        if (pt.IsNullable())
+                        {
+                            pt = Nullable.GetUnderlyingType(pt);
+                        }
+                        value = Convert.ChangeType(value, pt);
+                    }
                     propertyInfo.SetValue(entity, value, null);
                 }
             }

@@ -1,6 +1,7 @@
 namespace dbarone_api.Extensions;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Type extensions.
@@ -21,6 +22,23 @@ public static class TypeExtensions
         else
         {
             return null;
+        }
+    }
+
+    /// <summary>
+    /// Returns whether a Type is a nullable type.
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    public static bool IsNullable(this Type t)
+    {
+        if (t.IsGenericType && t.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -103,5 +121,23 @@ public static class TypeExtensions
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Returns true if an anonymous type (http://www.liensberger.it/web/blog/?p=191).
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static bool IsAnonymous(this Type type)
+    {
+        if (type == null)
+            throw new ArgumentNullException("type");
+
+        // HACK: The only way to detect anonymous types right now.
+        return Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute), false)
+            && type.IsGenericType && type.Name.Contains("AnonymousType")
+            && (type.Name.StartsWith("<>") || type.Name.StartsWith("VB$"))
+            && type.Attributes.HasFlag(TypeAttributes.NotPublic);
     }
 }
