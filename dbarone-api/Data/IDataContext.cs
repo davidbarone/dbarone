@@ -13,4 +13,5 @@ public interface IDataContext
     object[] Insert<T>(T entity);
     object[] Update<T>(T entity);
     void Delete<T>(object[] key);
+    T Create<T>();
 }

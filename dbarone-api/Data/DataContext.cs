@@ -3,6 +3,7 @@ namespace dbarone_api.Data;
 using Microsoft.Data.SqlClient;
 using dbarone_api.Lib.Data;
 using System.Collections;
+using dbarone_api.Entities;
 
 public class DataContext : IDataContext
 {
@@ -13,6 +14,11 @@ public class DataContext : IDataContext
         var csBuilder = new SqlConnectionStringBuilder(configuration["ConnectionStrings:dbarone"]);
         csBuilder.Password = configuration["DatabasePassword"]; // user-secret
         this._connectionString = csBuilder.ConnectionString;
+    }
+
+    public T Create<T>()
+    {
+        return Session.CreateEntity<T>();
     }
 
     public void Execute(string sql, object? param = null)

@@ -16,7 +16,7 @@ public interface ISession : IDisposable
     object ExecuteScalar(string sql, object param = null, CommandType commandType = CommandType.Text, int? commandTimeout = null);
     IEnumerable<T> Query<T>(string sql = null, object param = null, CommandType commandType = CommandType.Text, bool buffered = true);
     IEnumerable<Hashtable> Query(string sql, object param = null, CommandType commandType = CommandType.Text, Action<List<string>> callbackHeaders = null);
-    T Create<T>();
+    //T CreateEntity<T>();
     IEnumerable<T> Read<T>(object? filter = null);
     T? Find<T>(params object[] keys);
     T Single<T>(params object[] keys);

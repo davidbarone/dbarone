@@ -15,7 +15,9 @@ public class Hydrater
         var values = new Hashtable(StringComparer.InvariantCultureIgnoreCase);
 
         for (int i = 0; i < dataReader.FieldCount; i++)
+        {
             values.Add(dataReader.GetName(i), dataReader.GetValue(i));
+        }
 
         return values;
     }

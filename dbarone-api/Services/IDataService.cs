@@ -21,14 +21,4 @@ public interface IDataService
     public IEnumerable<RefreshToken> GetRefreshTokens(int? userId);
 
     #endregion
-
-    #region Resources
-
-    public Resource CreateResource(string filename, string contentType, byte[] data);
-    public IEnumerable<Resource> GetResources();
-    public Resource GetResource(int id);
-    public Resource GetResourceByFilename(string filename);
-    public void DeleteResource(int id);
-
-    #endregion
 }

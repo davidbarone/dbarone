@@ -27,6 +27,21 @@ public class ResponseEnvelope<T>
     }
 
     /// <summary>
+    /// Fluent syntax for adding messages to existing ResponseEnvelope.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    public ResponseEnvelope<T> AddMessage(ResponseMessage message)
+    {
+        if (this.Messages == null)
+        {
+            this.Messages = new List<ResponseMessage>();
+        }
+        this.Messages.Append(message);
+        return this;
+    }
+
+    /// <summary>
     /// Create a response envelope from an exception.
     /// </summary>
     /// <param name="e"></param>
