@@ -91,7 +91,7 @@ public class PostController : RestController
     [HttpPost("/posts")]
     public ActionResult<ResponseEnvelope<LinkedResource<Post>>> CreatePost(PostRequest post)
     {
-        var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post);
+        var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
         p.Validate();
         var keys = _dataService.Context.Insert<Post>(p);
         var createdPost = _dataService.Context.Single<Post>(keys);
@@ -116,7 +116,7 @@ public class PostController : RestController
         {
             throw new InvalidDataException($"Id {id} does not match resource id {post.Id}.");
         }
-        var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post);
+        var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
         p.Validate();
         var keys = _dataService.Context.Update<Post>(p);
         var updatedPost = _dataService.Context.Single<Post>(keys);
@@ -153,15 +153,15 @@ public class PostController : RestController
     public ActionResult<ResponseEnvelope<RelatedPostResponse>> GetRelatedPosts(int id)
     {
         var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
-        var current = _dataService.Context.Single<Post>(new object[] { id });
-        var parent = _dataService.Context.Find<Post>(new object[] { current.ParentId });
+        Post current = _dataService.Context.Single<Post>(new object[] { id });
+        var parent = _dataService.Context.Find<Post>(new object[] { current.ParentId! });
         var siblings = _dataService.Context.Read<Post>(new { ParentId = current.ParentId });
         var children = _dataService.Context.Read<Post>(new { ParentId = current.Id });
 
         return Ok(new RelatedPostResponse
         {
             Current = mapper.MapOne(current).ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = current.Id }) }),
-            Parent = mapper.MapOne(parent).ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = parent.Id }) }),
+            Parent = mapper.MapOne(parent).ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = parent != null ? parent.Id : (int?)null }) }),
             Siblings = mapper.MapMany(siblings).Select(s => s.ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = s.Id }) })),
             Children = mapper.MapMany(children).Select(s => s.ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = s.Id }) }))
         }.ToResponseEnvelope());
