@@ -55,7 +55,7 @@ public class PostController : RestController
     [HttpGet("/posts/{id}")]
     public ActionResult<ResponseEnvelope<LinkedResource<Post>>> GetPost(int id)
     {
-        var post = _dataService.Context.Single<Post>(id);
+        var post = _dataService.Context.Find<Post>(id);
         var linkedPost = post.ToLinkedResource(new Link[] {
             Url.GetLink("Related", this.GetRelatedPosts, new { id = id }),
             Url.GetLink("Update", this.UpdatePost, new { id = id }),
@@ -72,15 +72,8 @@ public class PostController : RestController
     [HttpGet("/{slug}")]
     public ActionResult<ResponseEnvelope<LinkedResource<Post>>> GetPostBySlug(string slug)
     {
-        var entity = _dataService.Context.Read<Post>(new { Slug = slug }).FirstOrDefault();
-        if (entity != null)
-        {
-            return GetPost(entity.Id);
-        }
-        else
-        {
-            throw new KeyNotFoundException($"Slug {slug} not found.");
-        }
+        var entity = _dataService.Context.Single<Post>(new { Slug = slug });
+        return GetPost(entity.Id);
     }
 
     /// <summary>
@@ -94,7 +87,7 @@ public class PostController : RestController
         var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
         p.Validate();
         var keys = _dataService.Context.Insert<Post>(p);
-        var createdPost = _dataService.Context.Single<Post>(keys);
+        var createdPost = _dataService.Context.Find<Post>(keys);
 
         // Links
         List<Link> links = new();
@@ -119,7 +112,7 @@ public class PostController : RestController
         var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
         p.Validate();
         var keys = _dataService.Context.Update<Post>(p);
-        var updatedPost = _dataService.Context.Single<Post>(keys);
+        var updatedPost = _dataService.Context.Find<Post>(keys);
 
         var linkedPost = updatedPost.ToLinkedResource(new Link[]
         {
@@ -137,7 +130,7 @@ public class PostController : RestController
     [Authorize]
     public ActionResult<ResponseEnvelope<LinkedResource<object?>>> DeletePost(int id)
     {
-        _dataService.Context.Delete<Post>(new object[] { id });
+        _dataService.Context.Delete<Post>(id);
         var obj = ((object?)null).ToLinkedResource<object>(new Link[] {
             Url.GetLink("Parent", this.GetPosts, null)
         });

@@ -251,44 +251,15 @@ public class Session : ISession
         return _keys.ToArray();
     }
 
-    public virtual T? Find<T>(params object[] keys)
-    {
-        Hashtable ht = new Hashtable();
-
-        var info = MetaDataStore.GetTableInfoFor<T>();
-        var columns = info.Columns.ToList();
-        var parameters = keys.ToList();
-        var keyColumns = columns.Where(c => c.Key).OrderBy(c => c.Order).ToList();
-        if (parameters.Count() != keyColumns.Count())
-        {
-            throw new Exception("Cannot find entity. Incorrect number of key values passed in to method.");
-        }
-
-        // Get the parameters
-        for (int i = 0; i < keyColumns.Count(); i++)
-        {
-            ht.Add(keyColumns[i].Name, parameters[i]);
-        }
-
-        // Execute
-        var sql = string.Format(
-            "SELECT * FROM [{0}] WHERE {1}",
-            info.Name,
-            string.Join(" AND ", keyColumns.Select(k => string.Format("[{0}] = @{0}", k.Name)))
-        );
-
-        var results = Query<T>(sql, ht);
-        return results.FirstOrDefault();
-    }
-
     /// <summary>
-    /// Returns a single entity using the key values, or throws an exception.
+    /// Returns a single entity based on keys. If keys not found then exception thrown.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="keys"></param>
     /// <returns></returns>
-    /// <exception cref="Exception">If not a single entity returned.</exception>
-    public virtual T Single<T>(params object[] keys)
+    /// <exception cref="Exception"></exception>
+    /// <exception cref="KeyNotFoundException"></exception>
+    public virtual T Find<T>(params object[] keys)
     {
         Hashtable ht = new Hashtable();
 
@@ -317,11 +288,28 @@ public class Session : ISession
         var results = Query<T>(sql, ht);
         if (results.Count() == 0)
         {
-            throw new Exception("Entity not found");
+            throw new KeyNotFoundException("Entity not found");
         }
         else if (results.Count() > 1)
         {
             throw new Exception("Duplicate entities found");
+        }
+        return results.First();
+    }
+
+    /// <summary>
+    /// Similar to Read() method, but requires a single row to be returned, otherwise an exception is thrown.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public virtual T Single<T>(object? filter = null)
+    {
+        var results = Read<T>(filter);
+        if (results.Count() != 1)
+        {
+            throw new Exception("Single() did not yield a single row.");
         }
         return results.First();
     }

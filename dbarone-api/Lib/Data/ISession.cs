@@ -18,8 +18,8 @@ public interface ISession : IDisposable
     IEnumerable<Hashtable> Query(string sql, object param = null, CommandType commandType = CommandType.Text, Action<List<string>> callbackHeaders = null);
     //T CreateEntity<T>();
     IEnumerable<T> Read<T>(object? filter = null);
-    T? Find<T>(params object[] keys);
-    T Single<T>(params object[] keys);
+    T Single<T>(object? filter = null);
+    T Find<T>(params object[] keys);
     object[] Insert<T>(T? entity);
     object[] Update<T>(T? entity);
     void Delete<T>(T? entity);

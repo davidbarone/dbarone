@@ -45,16 +45,16 @@ public class DataContext : IDataContext
         return session.Read<T>(filter);
     }
 
-    public T? Find<T>(params object[] id)
+    public T Find<T>(params object[] id)
     {
         using var session = Session.Create(this._connectionString);
         return session.Find<T>(id);
     }
 
-    public T Single<T>(params object[] id)
+    public T Single<T>(object? filter = null)
     {
         using var session = Session.Create(this._connectionString);
-        return session.Single<T>(id);
+        return session.Single<T>(filter);
     }
 
     public object[] Insert<T>(T entity)
@@ -72,7 +72,7 @@ public class DataContext : IDataContext
     public void Delete<T>(params object[] key)
     {
         using var session = Session.Create(this._connectionString);
-        var entity = session.Single<T>(key);
+        var entity = session.Find<T>(key);
         session.Delete<T>(entity);
     }
 }

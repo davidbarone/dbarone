@@ -54,7 +54,7 @@ public class GroupController : RestController
     [HttpGet("/groups/{id}")]
     public ActionResult<ResponseEnvelope<LinkedResource<Group>>> GetGroup(int id)
     {
-        var group = _dataService.Context.Single<Group>(new object[] { id });
+        var group = _dataService.Context.Find<Group>(id);
         var linkedGroup = group.ToLinkedResource(new Link[] {
             Url.GetLink("Update", this.UpdateGroup, new { id = id }),
             Url.GetLink("Delete", this.DeleteGroup, new { id = id })
@@ -72,7 +72,7 @@ public class GroupController : RestController
     {
         group.Validate();
         var keys = _dataService.Context.Insert<Group>(group);
-        var newItem = _dataService.Context.Single<Group>(keys);
+        var newItem = _dataService.Context.Find<Group>(keys);
 
         // Links
         List<Link> links = new();
@@ -96,7 +96,7 @@ public class GroupController : RestController
             throw new InvalidDataException($"Id {id} does not match resource id {group.Id}.");
         }
         var keys = _dataService.Context.Update<Group>(group);
-        var newGroup = _dataService.Context.Single<Group>(keys);
+        var newGroup = _dataService.Context.Find<Group>(keys);
 
         var linkedPost = newGroup.ToLinkedResource(new Link[]
         {

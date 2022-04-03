@@ -16,7 +16,19 @@ public class Hydrater
 
         for (int i = 0; i < dataReader.FieldCount; i++)
         {
-            values.Add(dataReader.GetName(i), dataReader.GetValue(i));
+            var name = dataReader.GetName(i);
+            var value = dataReader[name];
+            /*
+            var type = dataReader.GetFieldType(i);
+            if (type == typeof(byte[]))
+            {
+                var size = (int)dataReader.GetBytes(i, 0, null, 0, 0);
+                byte[] buffer = new byte[size];
+                dataReader.GetBytes(i, 0, buffer, 0, size);
+                value = buffer;
+            }
+            */
+            values.Add(name, value);
         }
 
         return values;

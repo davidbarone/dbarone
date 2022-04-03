@@ -4,15 +4,20 @@ using dbarone_api.Entities;
 using dbarone_api.Services;
 using dbarone_api.Models.Response;
 using dbarone_api.Extensions;
-using dbarone_api.Lib.ObjectMapper;
-using dbarone_api.Models.Response;
 
+/// <summary>
+/// Controller for handling resource requests.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class ResourceController : RestController
 {
     private readonly IDataService _dataService;
 
+    /// <summary>
+    /// Constructor for resource controller.
+    /// </summary>
+    /// <param name="dataService"></param>
     public ResourceController(IDataService dataService)
     {
         this._dataService = dataService;
@@ -44,7 +49,7 @@ public class ResourceController : RestController
     [HttpGet("/resources/{id}")]
     public FileContentResult GetResource(int id)
     {
-        var resource = _dataService.Context.Single<Resource>(new object[] { id });
+        var resource = _dataService.Context.Find<Resource>(id);
         return File(
             resource.Data, resource.ContentType, resource.Filename
         );
@@ -58,9 +63,7 @@ public class ResourceController : RestController
     [HttpGet("/static/{filename}")]
     public FileContentResult GetResourceByName(string filename)
     {
-        var keys = _dataService.Context.Read<Resource>(new { Filename = filename }).FirstOrDefault();
-        var resource = _dataService.Context.Single<Resource>(keys);
-
+        var resource = _dataService.Context.Single<Resource>(new { Filename = filename });
         return File(
             resource.Data, resource.ContentType, resource.Filename
         );
@@ -81,7 +84,7 @@ public class ResourceController : RestController
         resource.Data = new byte[fileSize];
         file.OpenReadStream().Read(resource.Data, 0, fileSize);
         var keys = _dataService.Context.Insert<Resource>(resource);
-        resource = _dataService.Context.Single<Resource>(keys);
+        resource = _dataService.Context.Find<Resource>(keys);
         return Ok(resource.ToLinkedResource(null).ToResponseEnvelope());
     }
 
@@ -93,7 +96,7 @@ public class ResourceController : RestController
     [HttpDelete("/resources/{id}")]
     public ActionResult<ResponseEnvelope<LinkedResource<object?>>> DeleteResource(int id)
     {
-        _dataService.Context.Delete<Resource>(new object[] { id });
+        _dataService.Context.Delete<Resource>(id);
         var obj = ((object?)null).ToLinkedResource<object>(new Link[] {
             Url.GetLink("Parent", this.GetResources, null)
         });
