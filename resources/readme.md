@@ -27,5 +27,6 @@ api
 
 ui
 --
-- Preact
-- 
+- Library: Preact https://preactjs.com/
+- Bootstrap: `npx preact-cli create default dbarone-ui`
+- File naming guide: https://github.com/airbnb/javascript/tree/master/react
