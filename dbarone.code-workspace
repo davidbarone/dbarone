@@ -34,7 +34,7 @@
         "request": "launch",
         "cwd": "${workspaceFolder:dbarone-ui}",
         "runtimeExecutable": "npm",
-        "runtimeArgs": ["run", "dev"],
+        "runtimeArgs": ["run", "serve:dev"],
         "address": "localhost",
         "port": 8080
       },

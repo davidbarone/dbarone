@@ -7,7 +7,14 @@ using dbarone_api.Lib.ObjectMapper;
 /// </summary>
 public class ResponseEnvelope<T>
 {
+    /// <summary>
+    /// The status of the response.
+    /// </summary>
     public ResponseStatus Status { get; set; }
+    
+    /// <summary>
+    /// The data / payload response
+    /// </summary>
     public T? Data { get; set; }
     public IEnumerable<ResponseMessage> Messages { get; set; }
 

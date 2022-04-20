@@ -1,9 +1,12 @@
+/* --------------------------------------------
+   Site-wide styling
+   -------------------------------------------- */
 html, body {
 	height: 100%;
 	width: 100%;
 	padding: 0;
 	margin: 0;
-	background: #FAFAFA;
+	background: white;
 	font-family: 'Helvetica Neue', arial, sans-serif;
 	font-weight: 400;
 	color: #444;
@@ -17,4 +20,53 @@ html, body {
 
 #app {
 	height: 100%;
+}
+
+.bgColor1 {
+    background-color: #0081c9;
+}
+
+.bgColor2 {
+    background-color: #ed7700;
+}
+
+.bgColor3 {
+    background-color: #425363;
+}
+
+.bgColor4 {
+    background-color: 	#bbbbbb;
+}
+
+.bgColor5 {
+    background-color: 	#dddddd;
+}
+
+.fgColor1 {
+    color: #0081c9;
+}
+
+.fgColor2 {
+    color: #ed7700;
+}
+
+.fgColor3 {
+    color: #425363;
+}
+
+.fgColor4 {
+    color: 	#bbbbbb;
+}
+
+.fgColor5 {
+    color: 	#dddddd;
+}
+
+/* Global Variables */
+:root {
+    --color1: #0081c9;
+    --color2: #ed7700;
+    --color3: #425363;
+    --color4: #bbbbbb;
+    --color5: #dddddd;
 }

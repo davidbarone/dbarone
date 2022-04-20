@@ -1,0 +1,43 @@
+div.field {
+  margin-top: 20px;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+}
+
+.readonly {
+  background: #ddd;
+}
+
+button.ButtonWidget {
+  margin-right: 8px;
+  display: inline-block;
+  height: 30px;
+  padding: 0 20px;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  line-height: 30px;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box;
+  background: var(--color1);
+}
+
+button.ButtonWidget:hover {
+  color: white;
+  background-color: var(--color2);
+  border-color: #888;
+  outline: 0;
+}
+
+button.ButtonWidget:visited {
+  text-decoration: none;
+  background-color: green;
+}
