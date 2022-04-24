@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
+import React, { useState, useEffect, FunctionComponent, useRef } from 'react';
 import { httpGet } from '../../utils/ApiFacade';
 import { PostType } from '../../models/PostModel';
 import ButtonWidget from '../../widgets/ButtonWidget';
@@ -13,16 +13,87 @@ interface PostProps {
     id: number;
 }
 
+const loadScriptSync = async (script:HTMLScriptElement) => {
+    return new Promise((resolve, reject) => {
+        script.onload = function() {
+            resolve({ script });
+        };
+        document.head.appendChild(script);
+    });
+};
+
+const loadCode = async (post:PostType) => {
+    
+    // Add inline style if set
+    if (post.style) {
+        const style = document.createElement('style');
+        style.innerText = post.style;
+        document.head.appendChild(style);
+    }
+
+    // Add head if any
+    // All head contents must be nodes with src attributes.
+    if (post.head) {
+        // Have to convert head string to node
+        const div = document.createElement('div');
+        div.innerHTML = post.head;
+        for (let i = 0; i < div.childNodes.length; i++) {
+            const node = div.childNodes[i];
+            const child = node as HTMLScriptElement;
+            if (node && node.nodeName === 'SCRIPT') {
+                if (child.src !== '') {
+                    const s = document.createElement('script');
+                    s.type = 'text/javascript';
+                    s.src = child.src;
+                    s.async = false;
+                    //document.head.appendChild(s);
+                    await loadScriptSync(s);
+                }
+            } else {
+                eval(child.innerHTML);
+            }
+        }
+        // Change this to div.childNodes to support multiple top-level nodes
+        div.childNodes.forEach(child => { const a = 1; });
+    }
+ 
+    // Add code if any
+    // Wrap this in inline <script> block.
+    if (post.code) {
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = false;
+        try {
+            // most browsers
+            script.appendChild(document.createTextNode(post.code));
+            document.head.appendChild(script);
+        } catch (e) {
+            // option (b) for other browsers
+            alert('error');
+            script.text = post.code;
+            document.head.appendChild(script);
+        }
+    }
+};
+        
 const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
     const [post, setPost] = useState<PostType>({} as PostType);
     const [relations, setRelations] = useState<PostRelationsModel>({} as PostRelationsModel);
     const visibilityState = useState<boolean>(false);
     const [sliderVisibility, setSliderVisibility] = visibilityState;
-
+    
     const init = () => {
-        httpGet(`/posts/${id}`, `Loaded post ${id} successfully.`).then((result) => setPost(result.body.data));
+        httpGet(`/posts/${id}`, `Loaded post ${id} successfully in viewer.`)
+            .then((result) => {
+                setPost(result.body.data);
+            });
         httpGet(`/posts/${id}/related`, `Loaded post ${id} relations successfully.`).then((result) => setRelations(result.body.data));
+        /* Head, style and code */
     };
+
+    useEffect(() => {
+        loadCode(post);
+    }, [post]);
 
     useEffect(() => {
         init();
@@ -32,19 +103,14 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
         <div className={style.postContainer}>
             <h1>{post.title}</h1>
             <div className={style.postedBy}>
-                <p>By {post.updatedBy} on {post.updatedDt}</p>
-                <div>
-                    <button className="button" onClick={() => { alert('d'); }}>
-                        Edit
-                    </button>
-                </div>
+                By {post.updatedBy} on {post.updatedDt}
             </div>
+            <ButtonWidget click={() => { setSliderVisibility(!sliderVisibility); }} label="Edit Post"></ButtonWidget>
+            <ButtonWidget href='/posts' label="Posts"></ButtonWidget>
             <div
                 style={{ marginTop: '6px' }}
                 dangerouslySetInnerHTML={{ __html: post.content }}
             ></div>
-            <ButtonWidget click={() => { setSliderVisibility(!sliderVisibility); }} label="Edit Post"></ButtonWidget>
-            <ButtonWidget href='/posts' label="Posts"></ButtonWidget>
             <ViewCommentsComponent postId={id} comments={post.comments}></ViewCommentsComponent>
             {/* Slider for creating new posts */}
             <SliderWidget visibilityState={visibilityState} onClose={init}>
@@ -98,7 +164,7 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
             ) : <></>);
     };
 
-
+    
     return (
         <>
             <div className={style.wrapper}>

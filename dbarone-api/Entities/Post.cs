@@ -59,19 +59,19 @@ public class Post
     /// <summary>
     /// The post code content.
     /// </summary>
-    [StringLengthValidator(Min = 1, Max = Int16.MaxValue)]
+    [StringLengthValidator(Min = 0, Max = Int16.MaxValue)]
     public string? Code { get; set; }
 
     /// <summary>
     /// The post style content.
     /// </summary>
-    [StringLengthValidator(Min = 1, Max = Int16.MaxValue)]
+    [StringLengthValidator(Min = 0, Max = Int16.MaxValue)]
     public string? Style { get; set; }
 
     /// <summary>
     /// The post head content.
     /// </summary>
-    [StringLengthValidator(Min = 1, Max = Int16.MaxValue)]
+    [StringLengthValidator(Min = 0, Max = Int16.MaxValue)]
     public string? Head { get; set; }
 
     /// <summary>

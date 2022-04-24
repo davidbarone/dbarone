@@ -1,11 +1,11 @@
-import React, { FunctionComponent, MouseEventHandler, useRef } from 'react';
+import React, { FunctionComponent, ChangeEvent, useRef } from 'react';
 import style from './style.css';
 
 interface DropdownProps {
   name?: string;
   label: string;
   values: string[];
-  texts: string[];
+  texts?: string[];
   multiple: boolean;
   size: number;
   selectedValue: string;
@@ -21,32 +21,32 @@ const DropdownWidget: FunctionComponent<DropdownProps> = ({
     state = undefined,
     disabled = false,
     values = [],
-    texts = [],
+    texts = undefined,
     multiple = false,
     size = 4,
     selectedValue = undefined,
     onInputHook = undefined,
-    nullText=undefined}) => {
+    nullText = undefined }) => {
 
     const [target, setTarget] = state ? state : [undefined, undefined];
-    const selectNode = useRef(null);
+    const selectNode = useRef<HTMLSelectElement>(null);
 
-    const onChange = (e) => {
-        if (selectNode.current!==null) {
-            let val = e.target.value;
-
-            // HTML <option> does not support null values. Must convert '' to null
-            if (val === '') {
-                val = null;
-            }
-
-            // If multiple select, we must get the value a slightly longer way.
-            if (multiple) {
-                val = Array.from(selectNode.current.options)
+    const onChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        if (selectNode.current !== null) {
+            if (!multiple) {
+                const val = e.target.value;
+                if (setTarget != null) {
+                    setTarget({ ...target, [e.target.name]: val });
+                }
+            } else {
+                // If multiple select, we must get the value a slightly longer way.
+                const val = Array.from(selectNode.current.options)
                     .filter((o) => o.selected)
                     .map((o) => o.value);
+                if (setTarget != null) {
+                    setTarget({ ...target, [e.target.name]: val });
+                }
             }
-            setTarget({ ...target, [e.target.name]: val });
 
             if (onInputHook) {
                 onInputHook(e);
@@ -54,6 +54,7 @@ const DropdownWidget: FunctionComponent<DropdownProps> = ({
         }
     };
 
+    values = values || [];
     return (
         <div className={style.field}>
             <label>{label}:</label>
@@ -65,7 +66,7 @@ const DropdownWidget: FunctionComponent<DropdownProps> = ({
                 name={name}
                 onChange={onChange}
             >
-                {(nullText !== undefined ? [undefined, ...values] : values).map((v, i) => (
+                {(nullText !== undefined ? ['', ...values] : values).map((v, i) => (
                     <option
                         key={i}
                         label={
