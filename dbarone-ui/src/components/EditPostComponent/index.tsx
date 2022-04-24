@@ -40,19 +40,26 @@ const EditPost: FunctionComponent<PostProps> = ({ id = null }) => {
                 type='text' />
 
             <InputWidget
-                label='Teaser'
+                label='Teaser (Note: this section does NOT support HTML)'
                 name='teaser'
                 type='text'
                 state={ postState }
                 rows={5} />
 
             <InputWidget
-                label='Content'
+                label='Content (Note: no executable code here. Put scripts in head or code sections).'
                 name='content'
                 type='text'
                 state={ postState }
                 rows={10} />
 
+            <InputWidget
+                label='Content (Note: no executable code here. Put scripts in head or code sections).'
+                name='content'
+                type='text'
+                state={ postState }
+                rows={10} />
+            
             <InputWidget
                 type='submit'
             />

@@ -111,5 +111,6 @@ public class Post
     /// <summary>
     /// Read only property. Set to true if the post is a child post.
     /// </summary>
+    [NotMapped]
     public bool IsChild => this.ParentId != null;
 }

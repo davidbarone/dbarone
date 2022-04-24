@@ -26,6 +26,19 @@ public static class HateoasExtensions
     }
 
     /// <summary>
+    /// Creates a response envelope from a list of items. Creates a page with pagination links.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="list"></param>
+    /// <returns></returns>
+    public static ResponseEnvelope<IEnumerable<T>?>? ToResponseEnvelope<T>(this IEnumerable<T> list, IUrlHelper urlHelper, Delegate getMember, int pageSize, int page) {
+        var linkedPaginatedResource = list.ToLinkedPaginatedResource<T>(urlHelper, getMember, pageSize, page);
+        var envelope = linkedPaginatedResource.Resource.ToResponseEnvelope();
+        envelope.AddLinks(linkedPaginatedResource.Links);
+        return envelope;
+    }
+
+    /// <summary>
     /// Returns a Link object for a Controller action and parameters.
     /// </summary>
     /// <param name="action"></param>

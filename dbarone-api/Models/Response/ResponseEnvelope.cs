@@ -16,7 +16,16 @@ public class ResponseEnvelope<T>
     /// The data / payload response
     /// </summary>
     public T? Data { get; set; }
-    public IEnumerable<ResponseMessage> Messages { get; set; }
+    
+    /// <summary>
+    /// Messages attached to the response (for example validation messages).
+    /// </summary>
+    public IEnumerable<ResponseMessage>? Messages { get; set; }
+
+   /// <summary>
+   /// REST links relating to the response. Typically used for pagination.
+   /// </summary>
+   public IEnumerable<Link>? Links { get; set; }
 
     /// <summary>
     /// Fluent syntax for adding messages to existing ResponseEnvelope.
@@ -34,7 +43,7 @@ public class ResponseEnvelope<T>
     }
 
     /// <summary>
-    /// Fluent syntax for adding messages to existing ResponseEnvelope.
+    /// Fluent syntax for adding a message to existing ResponseEnvelope.
     /// </summary>
     /// <param name="message"></param>
     /// <returns></returns>
@@ -45,6 +54,36 @@ public class ResponseEnvelope<T>
             this.Messages = new List<ResponseMessage>();
         }
         this.Messages.Append(message);
+        return this;
+    }
+
+    /// <summary>
+    /// Fluent syntax for adding links to existing ResponseEnvelope.
+    /// </summary>
+    /// <param name="links"></param>
+    /// <returns></returns>
+    public ResponseEnvelope<T> AddLinks(IEnumerable<Link> links)
+    {
+        if (this.Links == null)
+        {
+            this.Links = new List<Link>();
+        }
+        this.Links = this.Links.Union(links);
+        return this;
+    }
+
+    /// <summary>
+    /// Fluent syntax for adding link to existing ResponseEnvelope.
+    /// </summary>
+    /// <param name="link"></param>
+    /// <returns></returns>
+    public ResponseEnvelope<T> AddLink(Link link)
+    {
+        if (this.Links == null)
+        {
+            this.Links = new List<Link>();
+        }
+        this.Links.Append(link);
         return this;
     }
 
@@ -87,7 +126,7 @@ public class ResponseEnvelope<T>
                     Message = e.Message
                 },
                 Data = default,
-                Messages = new List<ResponseMessage> { { ResponseMessage.CreateError(e.Message) } }
+                Messages = new List<ResponseMessage> { new ResponseMessage() { Message = e.Message, Type = ResponseMessageType.ERROR } }
             };
         }
     }

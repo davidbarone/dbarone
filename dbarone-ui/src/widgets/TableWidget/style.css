@@ -3,12 +3,12 @@ table.TableWidget {
   font-size: 1em;
   font-family: sans-serif;
   min-width: 400px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   border-collapse: collapse;
 }
 
 table.TableWidget thead tr th {
   background-color: var(--color2);
+  color: var(--color7);
   padding: 0.5em 1em;
   text-align: left;
 }
@@ -18,7 +18,11 @@ table.TableWidget tbody tr td {
 }
 
 table.TableWidget tbody tr:nth-of-type(even) {
-  background-color: #f0f0f0;
+  background-color: var(--color5);
+}
+
+table.TableWidget tbody tr:nth-of-type(odd) {
+  background-color: var(--color6);
 }
 
 table.TableWidget tbody tr:last-of-type {
@@ -26,5 +30,6 @@ table.TableWidget tbody tr:last-of-type {
 }
 
 table.TableWidget tbody tr:hover {
-  background-color: #c3d3e3;
+  background-color: var(--color7);
+  color: var(--color4);
 }

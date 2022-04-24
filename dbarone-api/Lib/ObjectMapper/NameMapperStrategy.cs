@@ -14,7 +14,8 @@ public class NameMapperStrategy : IMapperStrategy
                               t.CanWrite &&
                               s.PropertyType.IsPublic &&
                               t.PropertyType.IsPublic &&
-                              s.PropertyType == t.PropertyType &&
+                              (s.PropertyType == t.PropertyType ||
+                              s.PropertyType.GetElementType() == t.PropertyType.GetElementType()) &&
                               (
                                   (s.PropertyType.IsValueType &&
                                   t.PropertyType.IsValueType

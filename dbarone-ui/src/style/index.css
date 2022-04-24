@@ -6,10 +6,10 @@ html, body {
 	width: 100%;
 	padding: 0;
 	margin: 0;
-	background: white;
-	font-family: 'Helvetica Neue', arial, sans-serif;
+	background: var(--color5);
+    font-family: Arial, Helvetica, sans-serif;
 	font-weight: 400;
-	color: #444;
+	color: var(--color4);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -22,51 +22,14 @@ html, body {
 	height: 100%;
 }
 
-.bgColor1 {
-    background-color: #0081c9;
-}
-
-.bgColor2 {
-    background-color: #ed7700;
-}
-
-.bgColor3 {
-    background-color: #425363;
-}
-
-.bgColor4 {
-    background-color: 	#bbbbbb;
-}
-
-.bgColor5 {
-    background-color: 	#dddddd;
-}
-
-.fgColor1 {
-    color: #0081c9;
-}
-
-.fgColor2 {
-    color: #ed7700;
-}
-
-.fgColor3 {
-    color: #425363;
-}
-
-.fgColor4 {
-    color: 	#bbbbbb;
-}
-
-.fgColor5 {
-    color: 	#dddddd;
-}
-
 /* Global Variables */
+/* See: https://encycolorpedia.com/123456 for good contrasting colors */
 :root {
-    --color1: #0081c9;
-    --color2: #ed7700;
-    --color3: #425363;
-    --color4: #bbbbbb;
-    --color5: #dddddd;
+    --color1: #1f4db2;
+    --color2: #e0b24d;
+    --color3: #bbbbbb;
+    --color4: #dddddd;
+    --color5: #1e1e1e;
+    --color6: #252525;
+    --color7: #383838;
 }

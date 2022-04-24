@@ -10,20 +10,25 @@ public class RelatedPostResponse
     /// <summary>
     /// The current post.
     /// </summary>
-    public LinkedResource<PostSummaryResponse?>? Current { get; set; }
+    public PostSummaryResponse? Current { get; set; }
 
     /// <summary>
     /// The parent post.
     /// </summary>
-    public LinkedResource<PostSummaryResponse?>? Parent { get; set; }
+    public PostSummaryResponse? Parent { get; set; }
 
     /// <summary>
     /// Sibling posts.
     /// </summary>
-    public IEnumerable<LinkedResource<PostSummaryResponse?>?>? Siblings { get; set; } = default!;
+    public IEnumerable<PostSummaryResponse?>? Siblings { get; set; }
 
     /// <summary>
     /// Child posts.
     /// </summary>
-    public IEnumerable<LinkedResource<PostSummaryResponse?>?>? Children { get; set; } = default!;
+    public IEnumerable<PostSummaryResponse?>? Children { get; set; }
+
+    /// <summary>
+    /// Set to true if the post has any relations.
+    /// </summary>
+    public bool HasRelations => Current!=null || Parent!=null || (Siblings!=null && Siblings.Any()) || (Children!=null && Children.Any());
 }

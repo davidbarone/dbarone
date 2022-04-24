@@ -4,6 +4,7 @@ import TableWidget from '../../widgets/TableWidget';
 import ButtonWidget from '../../widgets/ButtonWidget';
 import SliderWidget from '../../widgets/SliderWidget';
 import EditPostComponent from '../../components/EditPostComponent';
+import LinkType from '../../types/LinkType';
 
 type PostType = {
     id: number,
@@ -15,9 +16,14 @@ const PostsRoute: FunctionComponent = () => {
     const [posts, setPosts] = useState<Array<PostType>>([]);
     const visibilityState = useState<boolean>(false);
     const [sliderVisibility, setSliderVisibility] = visibilityState;
+    const [links, setLinks] = useState<Array<LinkType>>([]);
+    const [api, setApi] = useState<string>('/posts');
 
     const getPosts = () => {
-        httpGet('/posts', 'Loaded posts successfully.').then((result) => setPosts(result.body));
+        httpGet(api, 'Loaded posts successfully.').then((result) => {
+            setPosts(result.body.data);
+            setLinks(result.body.links);
+        });
     };
 
     const deletePost = (id: number) => {
@@ -26,11 +32,12 @@ const PostsRoute: FunctionComponent = () => {
 
     useEffect(() => {
         getPosts();
-    }, []);
+    }, [api]);
 
     return (
         <>
             <h1>Posts</h1>
+            <ButtonWidget click={() => { setSliderVisibility(!sliderVisibility); }} label="New Post"></ButtonWidget>            
             <TableWidget<PostType>
                 data={posts}
                 visible={true}
@@ -69,7 +76,10 @@ const PostsRoute: FunctionComponent = () => {
                 <EditPostComponent id={undefined}></EditPostComponent>
             </SliderWidget>
 
-            <ButtonWidget click={() => { setSliderVisibility(!sliderVisibility); }} label="New Post"></ButtonWidget>
+            {/* Pagination */}
+            {links.map((l, i) => (
+                <ButtonWidget key={i} label={l.rel} click={() => setApi(l.uri) }></ButtonWidget>
+            ))}
         </>
     );
 };

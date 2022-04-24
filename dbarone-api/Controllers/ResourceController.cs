@@ -100,6 +100,6 @@ public class ResourceController : RestController
         var obj = ((object?)null).ToLinkedResource<object>(new Link[] {
             Url.GetLink("Parent", this.GetResources, null)
         });
-        return Ok(obj.ToResponseEnvelope().AddMessage(new ResponseMessage($"Resource {id} successfully deleted.")));
+        return Ok(obj.ToResponseEnvelope().AddMessage(new ResponseMessage() { Message = $"Resource {id} successfully deleted." }));
     }
 }

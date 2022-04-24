@@ -7,6 +7,7 @@ using dbarone_api.Lib.ObjectMapper;
 using dbarone_api.Models.Post;
 using dbarone_api.Models.Response;
 using dbarone_api.Extensions;
+using Markdig;
 
 /// <summary>
 /// Services for posts.
@@ -33,18 +34,14 @@ public class PostController : RestController
     /// </summary>
     /// <returns>A set of posts.</returns>
     [HttpGet("/posts")]
-    public ActionResult<ResponseEnvelope<LinkedResource<IEnumerable<LinkedResource<PostSummaryResponse>>>>> GetPosts(int pageSize = 10, int page = 1)
+    public ActionResult<ResponseEnvelope<IEnumerable<PostSummaryResponse>>> GetPosts(int pageSize = 10, int page = 1)
     {
         if (pageSize > 1000) pageSize = 1000;
         if (pageSize < 1) pageSize = 1;
         if (page < 1) page = 1;
         var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
         var posts = mapper.MapMany(_dataService.Context.Read<Post>().Where(p => !p.IsChild));
-        var linkedPosts = posts.Select(g => g.ToLinkedResource(new Link[] {
-            Url.GetLink("View", this.GetPost, new { id = g.Id })
-        }));
-        var linkedPage = linkedPosts.ToLinkedPaginatedResource(Url, this.GetPosts, pageSize, page);
-        return Ok(linkedPage.ToResponseEnvelope());
+        return Ok(posts.ToResponseEnvelope(Url, this.GetPosts, pageSize, page));
     }
 
     /// <summary>
@@ -53,15 +50,25 @@ public class PostController : RestController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("/posts/{id}")]
-    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> GetPost(int id)
+    public ActionResult<ResponseEnvelope<Post>> GetPost(int id)
     {
         var post = _dataService.Context.Find<Post>(id);
-        var linkedPost = post.ToLinkedResource(new Link[] {
+
+        // Convert markdown to html?
+        if (post.PostType == PostType.MARKDOWN)
+        {
+            var pipeline = new MarkdownPipelineBuilder()
+                .UseAdvancedExtensions()
+                .Build();
+            post.Content = Markdown.ToHtml(post.Content, pipeline);
+        }
+
+        var links = new Link[] {
             Url.GetLink("Related", this.GetRelatedPosts, new { id = id }),
             Url.GetLink("Update", this.UpdatePost, new { id = id }),
             Url.GetLink("Delete", this.DeletePost, new { id = id })
-        });
-        return Ok(linkedPost.ToResponseEnvelope());
+        };
+        return Ok(post.ToResponseEnvelope().AddLinks(links));
     }
 
     /// <summary>
@@ -70,7 +77,7 @@ public class PostController : RestController
     /// <param name="slug"></param>
     /// <returns></returns>
     [HttpGet("/{slug}")]
-    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> GetPostBySlug(string slug)
+    public ActionResult<ResponseEnvelope<Post>> GetPostBySlug(string slug)
     {
         var entity = _dataService.Context.Single<Post>(new { Slug = slug });
         return GetPost(entity.Id);
@@ -82,7 +89,7 @@ public class PostController : RestController
     /// <param name="post">The post to create.</param>
     /// <returns></returns>
     [HttpPost("/posts")]
-    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> CreatePost(PostRequest post)
+    public ActionResult<ResponseEnvelope<Post>> CreatePost(PostRequest post)
     {
         var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
         p.Validate();
@@ -90,10 +97,10 @@ public class PostController : RestController
         var createdPost = _dataService.Context.Find<Post>(keys);
 
         // Links
-        List<Link> links = new();
-        links.Add(Url.GetLink("self", this.GetPost, new { id = createdPost.Id }));
-        var linkedPost = createdPost.ToLinkedResource<Post>(links);
-        return Ok(linkedPost.ToResponseEnvelope());
+        IEnumerable<Link> links = new Link[] {
+            Url.GetLink("self", this.GetPost, new { id = createdPost.Id })
+        };
+        return Ok(createdPost.ToResponseEnvelope().AddLinks(links));
     }
 
     /// <summary>
@@ -103,7 +110,7 @@ public class PostController : RestController
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPut("/posts/{id}")]
-    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> UpdatePost(int id, [FromBody] PostRequest post)
+    public ActionResult<LinkedResource<Post>> UpdatePost(int id, [FromBody] PostRequest post)
     {
         if (id != post.Id)
         {
@@ -114,11 +121,10 @@ public class PostController : RestController
         var keys = _dataService.Context.Update<Post>(p);
         var updatedPost = _dataService.Context.Find<Post>(keys);
 
-        var linkedPost = updatedPost.ToLinkedResource(new Link[]
-        {
+        var links = new Link[] {
             Url.GetLink("self", this.GetPost, new { id = updatedPost.Id })
-        });
-        return Ok(linkedPost.ToResponseEnvelope());
+        };
+        return Ok(updatedPost.ToResponseEnvelope().AddLinks(links));
     }
 
     /// <summary>
@@ -127,14 +133,13 @@ public class PostController : RestController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpDelete("/posts/{id}")]
-    [Authorize]
-    public ActionResult<ResponseEnvelope<LinkedResource<object?>>> DeletePost(int id)
+    public ActionResult<ResponseEnvelope<object?>> DeletePost(int id)
     {
         _dataService.Context.Delete<Post>(id);
-        var obj = ((object?)null).ToLinkedResource<object>(new Link[] {
+        var links = new Link[] {
             Url.GetLink("Parent", this.GetPosts, null)
-        });
-        return Ok(obj.ToResponseEnvelope());
+        };
+        return Ok(((object?)null).ToResponseEnvelope().AddLinks(links));
     }
 
     /// <summary>
@@ -146,17 +151,21 @@ public class PostController : RestController
     public ActionResult<ResponseEnvelope<RelatedPostResponse>> GetRelatedPosts(int id)
     {
         var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
-        Post current = _dataService.Context.Single<Post>(new object[] { id });
-        var parent = _dataService.Context.Find<Post>(new object[] { current.ParentId! });
+        Post current = _dataService.Context.Find<Post>(id);
+        Post? parent = null;
+        if (current.ParentId!=null)
+        {
+            parent = _dataService.Context.Single<Post>(new { id = current.ParentId.Value});
+        }
         var siblings = _dataService.Context.Read<Post>(new { ParentId = current.ParentId });
         var children = _dataService.Context.Read<Post>(new { ParentId = current.Id });
 
         return Ok(new RelatedPostResponse
         {
-            Current = mapper.MapOne(current).ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = current.Id }) }),
-            Parent = mapper.MapOne(parent).ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = parent != null ? parent.Id : (int?)null }) }),
-            Siblings = mapper.MapMany(siblings).Select(s => s.ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = s.Id }) })),
-            Children = mapper.MapMany(children).Select(s => s.ToLinkedResource(new Link[] { Url.GetLink("self", this.GetPost, new { id = s.Id }) }))
+            Current = mapper.MapOne(current),
+            Parent = mapper.MapOne(parent),
+            Siblings = mapper.MapMany(siblings),
+            Children = mapper.MapMany(children)
         }.ToResponseEnvelope());
     }
 }
