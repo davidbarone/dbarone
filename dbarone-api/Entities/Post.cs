@@ -77,6 +77,8 @@ public class Post
     /// <summary>
     /// The post type of content.
     /// </summary>
+    
+    [Column("PostType", EnumColumnBehaviour=EnumColumnBehaviourEnum.STRING)]
     public PostType PostType { get; set; } = PostType.HTML;
 
     /// <summary>

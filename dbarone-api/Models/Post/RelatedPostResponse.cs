@@ -30,5 +30,5 @@ public class RelatedPostResponse
     /// <summary>
     /// Set to true if the post has any relations.
     /// </summary>
-    public bool HasRelations => Current!=null || Parent!=null || (Siblings!=null && Siblings.Any()) || (Children!=null && Children.Any());
+    public bool HasRelations => Parent!=null || (Siblings!=null && Siblings.Any()) || (Children!=null && Children.Any());
 }

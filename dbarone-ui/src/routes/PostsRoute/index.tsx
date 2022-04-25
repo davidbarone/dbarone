@@ -50,7 +50,7 @@ const PostsRoute: FunctionComponent = () => {
                             <ButtonWidget
                                 title="View post"
                                 label="View"
-                                href={`/post/${row.id}`}
+                                href={`/posts/${row.id}`}
                                 visible={true}
                             />
                         </>

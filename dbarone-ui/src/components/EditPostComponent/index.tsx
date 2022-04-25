@@ -48,6 +48,12 @@ const EditPost: FunctionComponent<PostProps> = ({ id = null }) => {
                 type='text' />
 
             <InputWidget
+                label='Slug (optional)'
+                name='slug'
+                state={ postState }
+                type='text' />
+            
+            <InputWidget
                 label='Teaser (Note: this section does NOT support HTML)'
                 name='teaser'
                 type='text'
@@ -93,6 +99,12 @@ const EditPost: FunctionComponent<PostProps> = ({ id = null }) => {
                 state={ postState }
                 rows={5} />
 
+            <InputWidget
+                label='Parent Id (optional)'
+                name='parentId'
+                type='number'
+                state={ postState } />
+            
             <InputWidget
                 type='submit'
             />

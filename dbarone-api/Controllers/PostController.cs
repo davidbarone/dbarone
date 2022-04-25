@@ -157,7 +157,7 @@ public class PostController : RestController
         {
             parent = _dataService.Context.Single<Post>(new { id = current.ParentId.Value});
         }
-        var siblings = _dataService.Context.Read<Post>(new { ParentId = current.ParentId });
+        var siblings = _dataService.Context.Read<Post>(new { ParentId = current.ParentId }).Where(s=>s.Id!=id);
         var children = _dataService.Context.Read<Post>(new { ParentId = current.Id });
 
         return Ok(new RelatedPostResponse

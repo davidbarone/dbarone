@@ -123,12 +123,12 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
 
     const relationsDiv = () => {
         return (
-            relations && relations.hasRelations ? (
+            relations.hasRelations ? (
                 <div className={style.navbar}>
                     {relations.parent && (
                         <>
                             <h2>Parent</h2>
-                            <a href={`/post/${relations.parent.id}`}>
+                            <a href={`/posts/${relations.parent.id}`}>
                                 {relations.parent.title}
                             </a>
                         </>
@@ -140,7 +140,7 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
                             <h2>Siblings</h2>
                             {relations.siblings.map((value, index) => {
                                 return (
-                                    <a key={index} href={`/post/${value.id}`}>
+                                    <a key={index} href={`/posts/${value.id}`}>
                                         {value.title}
                                     </a>
                                 );
@@ -153,7 +153,7 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
                             <h2>Children</h2>
                             {relations.children.map((value, index) => {
                                 return (
-                                    <a key={index} href={`/post/${value.id}`}>
+                                    <a key={index} href={`/posts/${value.id}`}>
                                         {value.title}
                                     </a>
                                 );
