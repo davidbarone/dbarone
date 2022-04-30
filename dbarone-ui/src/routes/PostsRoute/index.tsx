@@ -4,7 +4,7 @@ import TableWidget from '../../widgets/TableWidget';
 import ButtonWidget from '../../widgets/ButtonWidget';
 import SliderWidget from '../../widgets/SliderWidget';
 import EditPostComponent from '../../components/EditPostComponent';
-import LinkType from '../../types/LinkType';
+import { LinkType } from '../../types/LinkType';
 
 type PostType = {
     id: number,
@@ -50,7 +50,7 @@ const PostsRoute: FunctionComponent = () => {
                             <ButtonWidget
                                 title="View post"
                                 label="View"
-                                href={`/posts/${row.id}`}
+                                href={`/post/${row.id}`}
                                 visible={true}
                             />
                         </>

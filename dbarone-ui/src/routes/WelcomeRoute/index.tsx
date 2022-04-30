@@ -1,12 +1,26 @@
 import React, { FunctionComponent } from 'react';
+import style from './style.css';
 
 const WelcomeRoute: FunctionComponent = () => {
     return (
         <>
-            <h1>Welcome</h1>
-            <p>Welome to the Web UI Reference Application. This application is a demonstration web UI application. You can get the source from:</p>
-            <a href='https://github.com/davidbarone/webapp'>https://github.com/davidbarone/webapp</a>
-            <p>This application is your standard blog site, featuring posts and comments. The API is faked using Json-Server, and is reset when you restart the application. Note that Json-Server supports updates and deletes.</p>
+            <section>
+                <div className={style.blockquoteContainer}>
+                    <blockquote cite="https://www.dbarone.com/">
+                        <p>People often ask me: "David, what's your greatest contribution to the Business Intelligence world?"</p>
+                        <p>I tell them "I'm good with colors. I use a lot of them in my charts".</p>
+                        <cite>
+                            <a href="https://www.dbarone.com">David Barone</a>
+                        </cite>
+                    </blockquote>
+                </div>
+
+                <div className={ style.links }>
+                    <a title="Linkedin" href="https://www.linkedin.com/in/david-barone-083aa05b/">LinkedIn</a>
+                    <a title="Github" href="https://github.com/davidbarone">Github</a>
+                    <a title="Mail" href="mailto:davidbarone@live.com">Email</a>
+                </div>
+            </section>
         </>
     );
 };

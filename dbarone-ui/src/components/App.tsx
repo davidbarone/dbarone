@@ -18,11 +18,11 @@ const App: FC = () => {
             <div className={style.main}>
                 <Routes>
                     <Route path="posts" element={<Posts />} />
-                    <Route path="posts/:id" element={<PostRouteById />} />
+                    <Route path="post/:id" element={<PostRouteById />} />
+                    <Route path="slug/:slug" element={<PostRouteBySlug />} />
                     <Route path="counter" element={<CounterRoute />} />
-                    <Route path="/" element={<Welcome />} />
-                    <Route path="/:slug" element={<PostRouteBySlug />} />
                     <Route path="*" element={<Welcome />} />
+                    <Route path="/" element={<Welcome />} />
                 </Routes>
                 <ToastContainer />
             </div>

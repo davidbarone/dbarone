@@ -1,0 +1,17 @@
+.blockquoteContainer {
+    margin: auto;
+    width: 1024px;
+    font-size: x-large
+}
+
+section {
+    padding: 80px 0px;
+}
+
+.links {
+    text-align: center;
+}
+
+.links a {
+    margin: 0px 12px;
+}
