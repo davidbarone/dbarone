@@ -68,6 +68,7 @@ public class GroupController : RestController
     /// <param name="group">The group to create.</param>
     /// <returns></returns>
     [HttpPost("/groups")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<LinkedResource<Group>>> CreateGroup(Group group)
     {
         group.Validate();
@@ -88,6 +89,7 @@ public class GroupController : RestController
     /// <param name="group"></param>
     /// <returns></returns>
     [HttpPut("/groups/{id}")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<LinkedResource<Group>>> UpdateGroup(int id, [FromBody] Group group)
     {
         group.Validate();
@@ -111,6 +113,7 @@ public class GroupController : RestController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpDelete("/groups/{id}")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<LinkedResource<object?>>> DeleteGroup(int id)
     {
         var keys = new object[] { id };

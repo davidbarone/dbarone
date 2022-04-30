@@ -6,11 +6,20 @@ using System.Text.Json.Serialization;
 using dbarone_api.Models.Users;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 {
     var services = builder.Services;
     var env = builder.Environment;
+
+    // Forward headers middleware to allow using reverse proxy
+    // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-6.0
+    services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders =
+            ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    });
 
     // configure DI for application services
     services.AddSingleton<IDataContext, DataContext>();
@@ -86,6 +95,9 @@ using (var scope = app.Services.CreateScope())
         app.UseSwaggerUI();
     }
 
+    // https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-6.0
+    app.UseForwardedHeaders();
+
     // global cors policy
     app.UseCors(x => x
         .SetIsOriginAllowed(origin => true)
@@ -106,5 +118,11 @@ using (var scope = app.Services.CreateScope())
     app.MapControllers();
 }
 
-//app.Run();
-app.Run("http://localhost:4000");
+if (app.Environment.IsDevelopment())
+{
+    app.Run("http://localhost:4000");
+}
+else
+{
+    app.Run();
+}

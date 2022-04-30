@@ -4,6 +4,7 @@ using dbarone_api.Entities;
 using dbarone_api.Services;
 using dbarone_api.Models.Response;
 using dbarone_api.Extensions;
+using dbarone_api.Authorization;
 
 /// <summary>
 /// Controller for handling resource requests.
@@ -75,6 +76,7 @@ public class ResourceController : RestController
     /// <param name="file">File to upload.</param>
     /// <returns></returns>
     [HttpPost("/resources/")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<LinkedResource<Post>>> UploadResource(IFormFile file)
     {
         var resource = _dataService.Context.Create<Resource>();
@@ -94,6 +96,7 @@ public class ResourceController : RestController
     /// <param name="id">The id of the resource to delete.</param>
     /// <returns></returns>
     [HttpDelete("/resources/{id}")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<LinkedResource<object?>>> DeleteResource(int id)
     {
         _dataService.Context.Delete<Resource>(id);

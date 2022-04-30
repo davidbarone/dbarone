@@ -349,5 +349,11 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# database backups
+# database backups (d.barone)
 db_backup/
+
+# CI scripts / deploy scripts (d.barone)
+resources/scripts
+
+# Letsencrypt assets (d.barone)
+resources/letsencrypt

@@ -4,7 +4,7 @@ const webpack = require('webpack');
 const { isConditionalExpression } = require('typescript');
 
 // Change variable to change names of output files.
-let appName = 'webapp';
+let appName = 'dbarone';
 
 module.exports = (env, argv) => {
     // Get the correct .env file for the environment:

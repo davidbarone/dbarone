@@ -89,6 +89,7 @@ public class PostController : RestController
     /// <param name="post">The post to create.</param>
     /// <returns></returns>
     [HttpPost("/posts")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<Post>> CreatePost(PostRequest post)
     {
         var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
@@ -110,6 +111,7 @@ public class PostController : RestController
     /// <param name="post"></param>
     /// <returns></returns>
     [HttpPut("/posts/{id}")]
+    [Authorize]
     public ActionResult<LinkedResource<Post>> UpdatePost(int id, [FromBody] PostRequest post)
     {
         if (id != post.Id)
@@ -133,6 +135,7 @@ public class PostController : RestController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpDelete("/posts/{id}")]
+    [Authorize]
     public ActionResult<ResponseEnvelope<object?>> DeletePost(int id)
     {
         _dataService.Context.Delete<Post>(id);
