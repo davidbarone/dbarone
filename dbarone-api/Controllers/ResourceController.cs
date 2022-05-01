@@ -51,8 +51,17 @@ public class ResourceController : RestController
     public FileContentResult GetResource(int id)
     {
         var resource = _dataService.Context.Find<Resource>(id);
+
+        // File automatically sets disposition to 'attachment'. Change
+        // to 'inline' to browser tries to show file inline
+       System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+       {
+              FileName = resource.Filename,
+              Inline = true
+       };        
+
         return File(
-            resource.Data, resource.ContentType, resource.Filename
+            resource.Data, resource.ContentType
         );
     }
 
@@ -65,8 +74,17 @@ public class ResourceController : RestController
     public FileContentResult GetResourceByName(string filename)
     {
         var resource = _dataService.Context.Single<Resource>(new { Filename = filename });
+
+        // File automatically sets disposition to 'attachment'. Change
+        // to 'inline' to browser tries to show file inline
+       System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+       {
+              FileName = resource.Filename,
+              Inline = true
+       };        
+
         return File(
-            resource.Data, resource.ContentType, resource.Filename
+            resource.Data, resource.ContentType
         );
     }
 
