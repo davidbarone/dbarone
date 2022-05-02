@@ -1,3 +1,4 @@
+import { ResponseEnvelopeType } from '../types/ResponseEnvelopeType';
 import { toast } from '../widgets/ToastWidget';
 
 type SettingsType = {
@@ -10,9 +11,11 @@ const getFullUrl = (urlPath: string): string => settings.API_DOMAIN + urlPath;
 
 function handleResponse(response: FlattenedResponse, successMessage: string) {
     if (!response.ok) {
-        throw Error(response.statusText);
+        toastFailure(response.envelope.status.message);
+        //throw Error(response.statusText);
+    } else {
+        toastSuccess(successMessage);
     }
-    toastSuccess(successMessage);
     return response;
 }
   
@@ -33,12 +36,24 @@ function toastFailure(message: string) {
 }
 
 interface FlattenedResponse {
+    
+    /** The Http headers */
     headers: Headers,
-    body: any,
+    
+    /** Response status */
     ok: boolean,
+
+    /** Optional link header value */
     link: object | null,
+    
+    /** Http status code */
     status: number
+
+    /** Http status text */
     statusText: string
+
+    /** body (envelope) */
+    envelope: ResponseEnvelopeType
 }
 
 /**
@@ -65,11 +80,11 @@ async function parseResponse(response: Response): Promise<FlattenedResponse> {
     const headers = response.headers;
     return {
         ok: response.ok,
-        body: body,
-        link: parseLinkHeader(headers.get('link') || ''),
-        headers: headers,
+        status: response.status,
         statusText: response.statusText,
-        status: response.status
+        headers: headers,
+        link: parseLinkHeader(headers.get('link') || ''),
+        envelope: body
     };
 }
 

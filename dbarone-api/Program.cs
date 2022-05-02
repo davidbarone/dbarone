@@ -7,6 +7,7 @@ using dbarone_api.Models.Users;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -29,7 +30,12 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<IUserService, UserService>();
 
     services.AddCors();
-    services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull);
+    services.AddControllers().AddJsonOptions(x =>
+    {
+        x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        x.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        x.JsonSerializerOptions.WriteIndented = true;
+    });
 
     // configure strongly typed settings object
     services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
@@ -80,7 +86,7 @@ using (var scope = app.Services.CreateScope())
         FirstName = "David",
         LastName = "Barone",
         Username = "dbarone",
-        Password = "dbarone",
+        Password = "sa12()PO",
         Email = "davidbarone@live.com"
     };
 

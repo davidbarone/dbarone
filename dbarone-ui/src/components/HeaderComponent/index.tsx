@@ -19,6 +19,9 @@ const Header: FunctionComponent = () => (
             <Link to="/counter">
                 Counter
             </Link>
+            <Link to="/login">
+                Login
+            </Link>
         </nav>
     </header>
 );

@@ -10,6 +10,7 @@ import { ToastContainer } from '../widgets/ToastWidget';
 import FooterComponent from './FooterComponent';
 import { PostType } from '../models/PostModel';
 import { httpGet } from '../utils/ApiFacade';
+import LoginRoute from '../routes/LoginRoute';
 
 const App: FC = () => {
     return (
@@ -21,6 +22,7 @@ const App: FC = () => {
                     <Route path="post/:id" element={<PostRouteById />} />
                     <Route path="slug/:slug" element={<PostRouteBySlug />} />
                     <Route path="counter" element={<CounterRoute />} />
+                    <Route path="login" element={<LoginRoute />} />
                     <Route path="*" element={<Welcome />} />
                     <Route path="/" element={<Welcome />} />
                 </Routes>
@@ -43,7 +45,7 @@ const PostRouteBySlug = () => {
     const init = () => {
         httpGet(`/${slug}`, `Loaded post from slug: '${slug}' successfully.`)
             .then((result) => {
-                setPost(result.body.data);
+                setPost(result.envelope.data);
             });
     };
 

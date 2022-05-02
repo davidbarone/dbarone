@@ -32,7 +32,7 @@ public class ErrorHandlerMiddleware
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 case AppException e:
-                    // custom application error
+                    // custom application error, authentication error
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 case KeyNotFoundException e:
@@ -48,7 +48,12 @@ public class ErrorHandlerMiddleware
                     break;
             }
 
-            var result = JsonSerializer.Serialize(envelope);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+            var result = JsonSerializer.Serialize(envelope, options);
             await response.WriteAsync(result);
         }
     }

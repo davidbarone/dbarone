@@ -357,3 +357,6 @@ resources/scripts
 
 # Letsencrypt assets (d.barone)
 resources/letsencrypt
+
+# database backups
+resources/db

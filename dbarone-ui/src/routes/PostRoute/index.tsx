@@ -85,9 +85,9 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
     const init = () => {
         httpGet(`/posts/${id}`, `Loaded post ${id} successfully in viewer.`)
             .then((result) => {
-                setPost(result.body.data);
+                setPost(result.envelope.data);
             });
-        httpGet(`/posts/${id}/related`, `Loaded post ${id} relations successfully.`).then((result) => setRelations(result.body.data));
+        httpGet(`/posts/${id}/related`, `Loaded post ${id} relations successfully.`).then((result) => setRelations(result.envelope.data));
         /* Head, style and code */
     };
 

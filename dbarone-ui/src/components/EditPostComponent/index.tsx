@@ -15,7 +15,7 @@ const EditPost: FunctionComponent<PostProps> = ({ id = null }) => {
 
     useEffect(() => {
         if (id) {
-            httpGet(`/posts/${id}`, `Loaded post ${id} successfully in editor.`).then((result) => setPost(result.body.data));
+            httpGet(`/posts/${id}`, `Loaded post ${id} successfully in editor.`).then((result) => setPost(result.envelope.data));
         }
     }, [id]);
 
