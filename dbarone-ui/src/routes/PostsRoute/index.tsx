@@ -21,8 +21,8 @@ const PostsRoute: FunctionComponent = () => {
 
     const getPosts = () => {
         httpGet(api, 'Loaded posts successfully.').then((result) => {
-            setPosts(result.body.data);
-            setLinks(result.body.links);
+            setPosts(result.envelope.data);
+            setLinks(result.envelope.links);
         });
     };
 
