@@ -29,17 +29,14 @@ public class ResourceController : RestController
     /// </summary>
     /// <returns>List of resources.</returns>
     [HttpGet("/resources")]
-    public ActionResult<ResponseEnvelope<LinkedResource<IEnumerable<LinkedResource<Resource>>>>> GetResources(int pageSize = 10, int page = 1)
+    [Authorize]
+    public ActionResult<ResponseEnvelope<IEnumerable<Resource>>> GetResources(int pageSize = 10, int page = 1)
     {
         if (pageSize > 1000) pageSize = 1000;
         if (pageSize < 1) pageSize = 1;
         if (page < 1) page = 1;
         var resources = _dataService.Context.Read<Resource>();
-        var linkedResources = resources.Select(g => g.ToLinkedResource(new Link[] {
-            Url.GetLink("View", this.GetResource, new { id = g.Id })
-        }));
-        var linkedPage = linkedResources.ToLinkedPaginatedResource(Url, this.GetResources, pageSize, page);
-        return Ok(linkedPage.ToResponseEnvelope());
+        return Ok(resources.ToResponseEnvelope(Url, this.GetResources, pageSize, page));
     }
 
     /// <summary>
@@ -54,11 +51,11 @@ public class ResourceController : RestController
 
         // File automatically sets disposition to 'attachment'. Change
         // to 'inline' to browser tries to show file inline
-       System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
-       {
-              FileName = resource.Filename,
-              Inline = true
-       };        
+        System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+        {
+            FileName = resource.Filename,
+            Inline = true
+        };
 
         return File(
             resource.Data, resource.ContentType
@@ -77,11 +74,11 @@ public class ResourceController : RestController
 
         // File automatically sets disposition to 'attachment'. Change
         // to 'inline' to browser tries to show file inline
-       System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
-       {
-              FileName = resource.Filename,
-              Inline = true
-       };        
+        System.Net.Mime.ContentDisposition cd = new System.Net.Mime.ContentDisposition
+        {
+            FileName = resource.Filename,
+            Inline = true
+        };
 
         return File(
             resource.Data, resource.ContentType
@@ -95,7 +92,7 @@ public class ResourceController : RestController
     /// <returns></returns>
     [HttpPost("/resources/")]
     [Authorize]
-    public ActionResult<ResponseEnvelope<LinkedResource<Post>>> UploadResource(IFormFile file)
+    public ActionResult<ResponseEnvelope<Post>> UploadResource(IFormFile file)
     {
         var resource = _dataService.Context.Create<Resource>();
         resource.ContentType = file.ContentType;
@@ -105,7 +102,7 @@ public class ResourceController : RestController
         file.OpenReadStream().Read(resource.Data, 0, fileSize);
         var keys = _dataService.Context.Insert<Resource>(resource);
         resource = _dataService.Context.Find<Resource>(keys);
-        return Ok(resource.ToLinkedResource(null).ToResponseEnvelope());
+        return Ok(resource.ToResponseEnvelope());
     }
 
     /// <summary>
@@ -115,12 +112,15 @@ public class ResourceController : RestController
     /// <returns></returns>
     [HttpDelete("/resources/{id}")]
     [Authorize]
-    public ActionResult<ResponseEnvelope<LinkedResource<object?>>> DeleteResource(int id)
+    public ActionResult<ResponseEnvelope<object?>> DeleteResource(int id)
     {
         _dataService.Context.Delete<Resource>(id);
         var obj = ((object?)null).ToLinkedResource<object>(new Link[] {
             Url.GetLink("Parent", this.GetResources, null)
         });
-        return Ok(obj.ToResponseEnvelope().AddMessage(new ResponseMessage() { Message = $"Resource {id} successfully deleted." }));
+        var links = new Link[] {
+            Url.GetLink("Parent", this.GetResources, null)
+        };
+        return Ok(((object?)null).ToResponseEnvelope().AddLinks(links).AddMessage(new ResponseMessage() { Message = "Resource deleted OK." }));
     }
 }

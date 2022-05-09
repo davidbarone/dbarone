@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using dbarone_api.Authorization;
 using dbarone_api.Models.Users;
 using dbarone_api.Services;
+using dbarone_api.Extensions;
 
 [Authorize]
 [ApiController]
@@ -23,7 +24,7 @@ public class UsersController : ControllerBase
     {
         var response = _userService.Authenticate(model, ipAddress());
         setTokenCookie(response.RefreshToken);
-        return Ok(response);
+        return Ok(response.ToResponseEnvelope());
     }
 
     [AllowAnonymous]

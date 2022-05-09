@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import ResourcesComponent from '../../components/ResourcesComponent';
 import { TabsWidget } from '../../widgets/TabsWidget';
 import { Tab } from '../../widgets/TabsWidget/Tab';
 
@@ -11,7 +12,7 @@ const AdminRoute: FunctionComponent = () => {
                     <div>This is a post tab</div>
                 </Tab>
                 <Tab title='Resources'>
-                    <div>This is a resources tab</div>
+                    <ResourcesComponent></ResourcesComponent>
                 </Tab>
                 <Tab title='Users'>
                     <div>This is a users tab</div>

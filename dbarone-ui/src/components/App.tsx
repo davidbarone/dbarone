@@ -12,6 +12,7 @@ import { PostType } from '../models/PostModel';
 import { httpGet } from '../utils/ApiFacade';
 import LoginRoute from '../routes/LoginRoute';
 import AdminRoute from '../routes/AdminRoute';
+import LogoutRoute from '../routes/LogoutRoute';
 
 const App: FC = () => {
     return (
@@ -24,6 +25,7 @@ const App: FC = () => {
                     <Route path="slug/:slug" element={<PostRouteBySlug />} />
                     <Route path="counter" element={<CounterRoute />} />
                     <Route path="login" element={<LoginRoute />} />
+                    <Route path="logout" element={<LogoutRoute />} />
                     <Route path="admin" element={<AdminRoute />} />
                     <Route path="*" element={<Welcome />} />
                     <Route path="/" element={<Welcome />} />

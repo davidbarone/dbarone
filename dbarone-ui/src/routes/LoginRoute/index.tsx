@@ -10,7 +10,9 @@ const LoginRoute: FunctionComponent = () => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         const json = formToJson(e.currentTarget);
-        httpPost('/users/authenticate/', json, 'Authenticated successfully.');
+        httpPost('/users/authenticate', json, 'Authenticated successfully.').then((response) => {
+            sessionStorage.setItem('user', JSON.stringify(response.envelope.data));
+        });
         e.preventDefault();
     };
     

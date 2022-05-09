@@ -1,3 +1,4 @@
+import { TokenModel } from '../models/TokenModel';
 import { ResponseEnvelopeType } from '../types/ResponseEnvelopeType';
 import { toast } from '../widgets/ToastWidget';
 
@@ -12,13 +13,13 @@ const getFullUrl = (urlPath: string): string => settings.API_DOMAIN + urlPath;
 function handleResponse(response: FlattenedResponse, successMessage: string) {
     if (!response.ok) {
         toastFailure(response.envelope.status.message);
-        //throw Error(response.statusText);
+        throw Error(response.envelope.status.message);
     } else {
         toastSuccess(successMessage);
     }
     return response;
 }
-  
+
 function toastSuccess(message: string) {
     toast.show(message, {
         timeout: 3000,
@@ -26,7 +27,7 @@ function toastSuccess(message: string) {
         variant: 'success',
     });
 }
-  
+
 function toastFailure(message: string) {
     toast.show(message, {
         timeout: 3000,
@@ -36,16 +37,16 @@ function toastFailure(message: string) {
 }
 
 interface FlattenedResponse {
-    
+
     /** The Http headers */
     headers: Headers,
-    
+
     /** Response status */
     ok: boolean,
 
     /** Optional link header value */
     link: object | null,
-    
+
     /** Http status code */
     status: number
 
@@ -67,11 +68,11 @@ function parseLinkHeader(linkHeader: string): object | null {
         return null;
     }
     const linkHeadersArray = linkHeader.split(', ').map(header => header.split('; '));
-    const linkHeadersMap = linkHeadersArray.map( header => {
-        const thisHeaderRel = header[1].replace( /"/g, '' ).replace( 'rel=', '' );
-        const thisHeaderUrl = header[0].slice( 1, -1 );
-        return [ thisHeaderRel, thisHeaderUrl ];
-    } );
+    const linkHeadersMap = linkHeadersArray.map(header => {
+        const thisHeaderRel = header[1].replace(/"/g, '').replace('rel=', '');
+        const thisHeaderUrl = header[0].slice(1, -1);
+        return [thisHeaderRel, thisHeaderUrl];
+    });
     return Object.fromEntries(linkHeadersMap);
 }
 
@@ -94,8 +95,8 @@ async function parseResponse(response: Response): Promise<FlattenedResponse> {
  * @param options 
  * @returns 
  */
-async function fetchWrapper(url: string, options: object): Promise<FlattenedResponse> { 
-    return await new Promise((resolve, reject)=>{
+async function fetchWrapper(url: string, options: object): Promise<FlattenedResponse> {
+    return await new Promise((resolve, reject) => {
         fetch(url, options)
             .then(response => {
                 return parseResponse(response);
@@ -103,7 +104,7 @@ async function fetchWrapper(url: string, options: object): Promise<FlattenedResp
             .then((flattenedResponse) => resolve(flattenedResponse))
             .catch(error => {
                 reject(error);
-            }); 
+            });
     });
 }
 
@@ -113,17 +114,26 @@ async function fetchWrapper(url: string, options: object): Promise<FlattenedResp
  * @returns 
  */
 async function httpGet(url: string, successMessage: string): Promise<FlattenedResponse> {
+    const tokenStr = sessionStorage.getItem('user');
+    let user: any = null;
+    if (tokenStr) {
+        user = JSON.parse(tokenStr);
+    }
+    const headers: any = {};
+    headers['Content-Type'] = 'application/json';
+    if (user) {
+        headers['authorization'] = `Bearer ${user.jwtToken}`;
+    }
     url = getFullUrl(url);
     return fetchWrapper(url, {
         mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        credentials: 'include', // for cookies
+        withCredentials: true,
+        headers: headers,
     })
         .then((response) => handleResponse(response, successMessage))
         .then((response) => response)
         .catch((error) => {
-            toastFailure(error);
             throw error;
         });
 }
@@ -137,6 +147,8 @@ async function httpDelete(url: string, successMessage: string): Promise<Flattene
     url = getFullUrl(url);
     return fetchWrapper(url, {
         method: 'DELETE',
+        credentials: 'include',  // for cookies
+        withCredentials: true,
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json',
@@ -156,13 +168,24 @@ async function httpDelete(url: string, successMessage: string): Promise<Flattene
  * @returns 
  */
 async function httpPost(url: string, body: object, successMessage: string): Promise<FlattenedResponse> {
+    const tokenStr = sessionStorage.getItem('user');
+    let user: any = null;
+    if (tokenStr) {
+        user = JSON.parse(tokenStr);
+    }
+    const headers: any = {};
+    headers['Content-Type'] = 'application/json';
+    if (user) {
+        headers['authorization'] = `Bearer ${user.jwtToken}`;
+    }
+
     url = getFullUrl(url);
     return fetchWrapper(url, {
         method: 'POST',
+        credentials: 'include', // for cookies
+        withCredentials: true,
         mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(body)
     })
         .then((response) => handleResponse(response, successMessage))
@@ -182,6 +205,8 @@ async function httpPut(url: string, body: object, successMessage: string): Promi
     url = getFullUrl(url);
     return fetchWrapper(url, {
         method: 'PUT',
+        credentials: 'include', // for cookies
+        withCredentials: true,
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json',

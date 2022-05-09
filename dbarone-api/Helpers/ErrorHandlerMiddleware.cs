@@ -4,6 +4,7 @@ using System.Net;
 using System.Text.Json;
 using dbarone_api.Lib.Validation;
 using dbarone_api.Models.Response;
+using System.Security;
 
 public class ErrorHandlerMiddleware
 {
@@ -31,8 +32,11 @@ public class ErrorHandlerMiddleware
                 case ValidationException e:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
+                case SecurityException e:
+                    response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    break;
                 case AppException e:
-                    // custom application error, authentication error
+                    // custom application error
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     break;
                 case KeyNotFoundException e:

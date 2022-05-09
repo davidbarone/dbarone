@@ -25,7 +25,7 @@ export const TabHeaderItem: FunctionComponent<TabHeaderItemProps> = ({ title, ac
 
 type reduceType = {
     header: JSX.Element[],
-    body: JSX.Element[]
+    body: JSX.Element
 }
 
 interface TabWidgetProps {
@@ -39,7 +39,7 @@ export const TabsWidget: FunctionComponent<TabWidgetProps> = ({
 }) => {
     // stores the current tab index
     const [tabId, setTabId] = useState<number>(activeTabId);
-    const [reduce, setReduce] = useState<reduceType>({header: [], body: []});
+    const [reduce, setReduce] = useState<reduceType>({header: [], body: <></>});
 
     useEffect(() => {
         // update tab state
@@ -56,9 +56,9 @@ export const TabsWidget: FunctionComponent<TabWidgetProps> = ({
 };
 
 function tabsToRender(children: JSX.Element[], activeTab: number, setTabIdState: React.Dispatch<React.SetStateAction<number>>): reduceType {
-    const initialValue: { header: JSX.Element[], body: JSX.Element[] } = {
+    const initialValue: { header: JSX.Element[], body: JSX.Element } = {
         header: [],
-        body: [],
+        body: <></>,
     };
 
     // acc, tab, idx
@@ -75,11 +75,11 @@ function tabsToRender(children: JSX.Element[], activeTab: number, setTabIdState:
             ></TabHeaderItem>
         );
 
-        const ContentItem = isActive ? curr : <></>;
+        const ContentItem = isActive ? curr : prev.body;
 
         return {
             header: [...prev.header, HeaderItem],
-            body: [...prev.body, ContentItem],
+            body: ContentItem,
         };
     }, initialValue);
 }
