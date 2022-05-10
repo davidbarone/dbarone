@@ -1,10 +1,11 @@
 import React, { useState, useEffect, FunctionComponent } from 'react';
-import { httpGet, httpDelete } from '../../utils/ApiFacade';
+import { httpGet, httpDelete, httpPost } from '../../utils/ApiFacade';
 import TableWidget from '../../widgets/TableWidget';
 import ButtonWidget from '../../widgets/ButtonWidget';
 import SliderWidget from '../../widgets/SliderWidget';
 import EditPostComponent from '../../components/EditPostComponent';
 import { LinkType } from '../../types/LinkType';
+import FileUploaderWidget from '../../widgets/FileUploadWidget';
 
 type ResourceType = {
     id: number,
@@ -32,13 +33,20 @@ const ResourcesComponent: FunctionComponent = () => {
         httpDelete(`/resources/${id}`, `Deleted resource ${id} successfully.`).then(r => getResources());
     };
 
+    const addResource = (e: React.ChangeEvent<HTMLInputElement>, file: File) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        httpPost('/resources', fd, 'Resource uploaded successfully', true).then(r => {
+            getResources();
+        });
+    };
+    
     useEffect(() => {
         getResources();
     }, [api]);
 
     return (
         <>
-            <h1>Resources</h1>
             <TableWidget<ResourceType>
                 data={resources}
                 visible={true}
@@ -70,6 +78,9 @@ const ResourcesComponent: FunctionComponent = () => {
             {links.map((l, i) => (
                 <ButtonWidget key={i} label={l.rel} click={() => setApi(l.uri) }></ButtonWidget>
             ))}
+
+            {/* Upload Resource */}
+            <FileUploaderWidget label='Upload' name='Upload' action={addResource}></FileUploaderWidget>
         </>
     );
 };

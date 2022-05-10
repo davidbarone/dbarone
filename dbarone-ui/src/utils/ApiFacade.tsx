@@ -145,14 +145,23 @@ async function httpGet(url: string, successMessage: string): Promise<FlattenedRe
  */
 async function httpDelete(url: string, successMessage: string): Promise<FlattenedResponse> {
     url = getFullUrl(url);
+
+    const tokenStr = sessionStorage.getItem('user');
+    let user: any = null;
+    if (tokenStr) {
+        user = JSON.parse(tokenStr);
+    }
+    const headers: any = {};
+    if (user) {
+        headers['authorization'] = `Bearer ${user.jwtToken}`;
+    }
+
     return fetchWrapper(url, {
         method: 'DELETE',
         credentials: 'include',  // for cookies
         withCredentials: true,
         mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: headers,
     })
         .then((response) => handleResponse(response, successMessage))
         .then((response) => response)
@@ -167,14 +176,16 @@ async function httpDelete(url: string, successMessage: string): Promise<Flattene
  * @param url 
  * @returns 
  */
-async function httpPost(url: string, body: object, successMessage: string): Promise<FlattenedResponse> {
+async function httpPost(url: string, body: object, successMessage: string, isBodyRaw = false): Promise<FlattenedResponse> {
     const tokenStr = sessionStorage.getItem('user');
     let user: any = null;
     if (tokenStr) {
         user = JSON.parse(tokenStr);
     }
     const headers: any = {};
-    headers['Content-Type'] = 'application/json';
+    if (!isBodyRaw) {
+        headers['Content-Type'] = 'application/json';
+    }
     if (user) {
         headers['authorization'] = `Bearer ${user.jwtToken}`;
     }
@@ -186,11 +197,12 @@ async function httpPost(url: string, body: object, successMessage: string): Prom
         withCredentials: true,
         mode: 'cors',
         headers: headers,
-        body: JSON.stringify(body)
+        body: isBodyRaw ? body : JSON.stringify(body)       // For file uploads we don't stringify.
     })
         .then((response) => handleResponse(response, successMessage))
         .then((response) => response)
         .catch((error) => {
+            alert(error);
             toastFailure(error);
             throw error;
         });

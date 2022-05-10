@@ -90,7 +90,7 @@ public class ResourceController : RestController
     /// </summary>
     /// <param name="file">File to upload.</param>
     /// <returns></returns>
-    [HttpPost("/resources/")]
+    [HttpPost("/resources")]
     [Authorize]
     public ActionResult<ResponseEnvelope<Post>> UploadResource(IFormFile file)
     {
