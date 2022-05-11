@@ -4,6 +4,8 @@ import { LoginModel } from '../../models/LoginModel';
 import { httpPost } from '../../utils/ApiFacade';
 import { formToJson } from '../../utils/Utilities';
 import style from './style.css';
+import { setSessionStorage } from '../../utils/Utilities';
+import { TokenModel } from '../../models/TokenModel';
 
 const LoginRoute: FunctionComponent = () => {
     const state = useState<LoginModel>({Username: '', Password: ''});
@@ -11,9 +13,12 @@ const LoginRoute: FunctionComponent = () => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         const json = formToJson(e.currentTarget);
         httpPost('/users/authenticate', json, 'Authenticated successfully.').then((response) => {
-            sessionStorage.setItem('user', JSON.stringify(response.envelope.data));
+            setSessionStorage<TokenModel>('user', response.envelope.data);
+            
+            // redirect to profile
+            window.location.href = '/profile';
         });
-        e.preventDefault();
+        e.preventDefault();        
     };
     
     return (

@@ -1,6 +1,7 @@
 import { TokenModel } from '../models/TokenModel';
 import { ResponseEnvelopeType } from '../types/ResponseEnvelopeType';
 import { toast } from '../widgets/ToastWidget';
+import { getSessionStorage } from '../utils/Utilities';
 
 type SettingsType = {
     API_DOMAIN: string
@@ -114,11 +115,7 @@ async function fetchWrapper(url: string, options: object): Promise<FlattenedResp
  * @returns 
  */
 async function httpGet(url: string, successMessage: string): Promise<FlattenedResponse> {
-    const tokenStr = sessionStorage.getItem('user');
-    let user: any = null;
-    if (tokenStr) {
-        user = JSON.parse(tokenStr);
-    }
+    const user = getSessionStorage<TokenModel>('user');
     const headers: any = {};
     headers['Content-Type'] = 'application/json';
     if (user) {
@@ -146,11 +143,7 @@ async function httpGet(url: string, successMessage: string): Promise<FlattenedRe
 async function httpDelete(url: string, successMessage: string): Promise<FlattenedResponse> {
     url = getFullUrl(url);
 
-    const tokenStr = sessionStorage.getItem('user');
-    let user: any = null;
-    if (tokenStr) {
-        user = JSON.parse(tokenStr);
-    }
+    const user = getSessionStorage<TokenModel>('user');
     const headers: any = {};
     if (user) {
         headers['authorization'] = `Bearer ${user.jwtToken}`;
@@ -177,11 +170,7 @@ async function httpDelete(url: string, successMessage: string): Promise<Flattene
  * @returns 
  */
 async function httpPost(url: string, body: object, successMessage: string, isBodyRaw = false): Promise<FlattenedResponse> {
-    const tokenStr = sessionStorage.getItem('user');
-    let user: any = null;
-    if (tokenStr) {
-        user = JSON.parse(tokenStr);
-    }
+    const user = getSessionStorage<TokenModel>('user');
     const headers: any = {};
     if (!isBodyRaw) {
         headers['Content-Type'] = 'application/json';
@@ -214,15 +203,20 @@ async function httpPost(url: string, body: object, successMessage: string, isBod
  * @returns 
  */
 async function httpPut(url: string, body: object, successMessage: string): Promise<FlattenedResponse> {
+    const user = getSessionStorage<TokenModel>('user');
     url = getFullUrl(url);
+    const headers: any = {};
+    headers['Content-Type'] = 'application/json';
+    if (user) {
+        headers['authorization'] = `Bearer ${user.jwtToken}`;
+    }
+
     return fetchWrapper(url, {
         method: 'PUT',
         credentials: 'include', // for cookies
         withCredentials: true,
         mode: 'cors',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: headers,
         body: JSON.stringify(body)
     })
         .then((response) => handleResponse(response, successMessage))

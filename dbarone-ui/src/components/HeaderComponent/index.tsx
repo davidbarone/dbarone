@@ -2,6 +2,7 @@ import React, { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 import style from './style.css';
 import logo from '../../assets/logo.png';
+import UserInfoComponent from '../UserInfoComponent';
 
 const Header: FunctionComponent = () => (
     <header className={style.header}>
@@ -22,12 +23,7 @@ const Header: FunctionComponent = () => (
             <Link to="/admin">
                 Admin
             </Link>
-            <Link to="/login">
-                Login
-            </Link>
-            <Link to="/logout">
-                Logout
-            </Link>
+            <UserInfoComponent></UserInfoComponent>
         </nav>
     </header>
 );
