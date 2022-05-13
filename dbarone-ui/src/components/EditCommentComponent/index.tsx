@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FunctionComponent } from 'react';
 import { httpGet, httpPost, httpPut } from '../../utils/ApiFacade';
 import InputWidget from '../../widgets/InputWidget';
-import { formToJson } from '../../utils/Utilities';
+import { formToObject } from '../../utils/Utilities';
 import { CommentModel } from '../../models/CommentModel';
 
 interface CommentProps {
@@ -28,7 +28,7 @@ const EditCommentComponent: FunctionComponent<CommentProps> = ({ id = null, post
     }, [id]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        const json = formToJson(e.currentTarget);
+        const json = formToObject(e.currentTarget);
         if (id) {
             // update
             httpPut(`/comments/${id}`, json, `Comment ${id} updated successfully.`);

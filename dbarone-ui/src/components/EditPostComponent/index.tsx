@@ -2,7 +2,7 @@ import React, { useState, useEffect, FunctionComponent } from 'react';
 import { httpGet, httpPost, httpPut } from '../../utils/ApiFacade';
 import { PostType } from '../../models/PostModel';
 import InputWidget from '../../widgets/InputWidget';
-import { formToJson } from '../../utils/Utilities';
+import { formToObject } from '../../utils/Utilities';
 import DropdownWidget from '../../widgets/DropdownWidget';
 
 interface PostProps {
@@ -20,12 +20,12 @@ const EditPost: FunctionComponent<PostProps> = ({ id = null }) => {
     }, [id]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        const json = formToJson(e.currentTarget);
+        const json = formToObject(e.currentTarget);
         if (id) {
             // update
             httpPut(`/posts/${id}`, json, `Post ${id} updated successfully.`);
         } else {
-            httpPost('/posts/', json, 'Post created successfully.');
+            httpPost('/posts', json, 'Post created successfully.');
         }
         e.preventDefault();
     };

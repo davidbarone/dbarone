@@ -42,14 +42,24 @@ const getSessionStorage = <T>(key: string): T | null => {
     }
 };
 
-const formToJson = (form: HTMLFormElement): { [k: string]: FormDataEntryValue } => {
+/**
+ * Converts a form to an object.
+ * @param form 
+ * @returns 
+ */
+const formToObject = (form: HTMLFormElement): { [k: string]: unknown } => {
     const data = new FormData(form);
-    const json = Object.fromEntries(data.entries());
+    const json: {[k: string]: unknown} = Object.fromEntries(data.entries());
+    for (const k in json) {
+        if (!json[k]) {
+            json[k] = null;
+        }
+    }
     return json;
 };
 
 export {
-    formToJson,
+    formToObject,
     setSessionStorage,
     getSessionStorage
 };

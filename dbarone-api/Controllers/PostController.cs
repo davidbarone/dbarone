@@ -90,7 +90,7 @@ public class PostController : RestController
     /// <returns></returns>
     [HttpPost("/posts")]
     [Authorize]
-    public ActionResult<ResponseEnvelope<Post>> CreatePost(PostRequest post)
+    public ActionResult<ResponseEnvelope<Post>> CreatePost([FromBody] PostRequest post)
     {
         var p = ObjectMapper<PostRequest, Post>.Create().MapOne(post)!;
         p.Validate();

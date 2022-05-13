@@ -2,7 +2,7 @@ import React, { useState, useEffect, FunctionComponent, useRef } from 'react';
 import InputWidget from '../../widgets/InputWidget';
 import { LoginModel } from '../../models/LoginModel';
 import { httpPost } from '../../utils/ApiFacade';
-import { formToJson } from '../../utils/Utilities';
+import { formToObject } from '../../utils/Utilities';
 import style from './style.css';
 import { setSessionStorage } from '../../utils/Utilities';
 import { TokenModel } from '../../models/TokenModel';
@@ -11,7 +11,7 @@ const LoginRoute: FunctionComponent = () => {
     const state = useState<LoginModel>({Username: '', Password: ''});
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        const json = formToJson(e.currentTarget);
+        const json = formToObject(e.currentTarget);
         httpPost('/users/authenticate', json, 'Authenticated successfully.').then((response) => {
             setSessionStorage<TokenModel>('user', response.envelope.data);
             
