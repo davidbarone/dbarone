@@ -24,4 +24,14 @@ public class PostSummaryResponse
     /// Short text for the post.
     /// </summary>
     public string? Teaser { get; set; }
+
+    /// <summary>
+    /// Created date for the post.
+    /// </summary>
+    public DateTime CreatedDt { get; set; }
+
+    /// <summary>
+    /// Created by for the post.
+    /// </summary>
+    public string? CreatedBy { get; set; }
 }

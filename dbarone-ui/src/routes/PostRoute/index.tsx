@@ -167,10 +167,13 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
     
     return (
         <>
-            <div className={style.wrapper}>
-                {relationsDiv()}
-                {postDiv(post)}
-            </div>
+            {
+                post.id && 
+                <div className={style.wrapper}>
+                    {relationsDiv()}
+                    {postDiv(post)}
+                </div>
+            }
         </>
     );
 };

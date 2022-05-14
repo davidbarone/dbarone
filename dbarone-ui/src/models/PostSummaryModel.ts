@@ -3,4 +3,6 @@ export type PostSummaryModel = {
     title: string,
     slug: string,
     teaser: string,
-}  
+    createdDt: Date,
+    createdBy: string
+}
