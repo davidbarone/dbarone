@@ -21,6 +21,7 @@ const EditPost: FunctionComponent<PostProps> = ({ id = null }) => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         const json = formToObject(e.currentTarget);
+
         if (id) {
             // update
             httpPut(`/posts/${id}`, json, `Post ${id} updated successfully.`);

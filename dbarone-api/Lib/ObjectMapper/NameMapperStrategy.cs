@@ -1,4 +1,5 @@
 namespace dbarone_api.Lib.ObjectMapper;
+using dbarone_api.Extensions;
 
 public class NameMapperStrategy : IMapperStrategy
 {
@@ -20,8 +21,13 @@ public class NameMapperStrategy : IMapperStrategy
                                   (s.PropertyType.IsValueType &&
                                   t.PropertyType.IsValueType
                                   ) ||
-                                  (s.PropertyType == typeof(string) &&
+                                  (s.PropertyType == typeof(string) ||
                                   t.PropertyType == typeof(string)
+                                  ) ||
+                                  (
+                                      // source or target is nullable type
+                                      (s.PropertyType.IsNullable() && s.PropertyType.GetNullableUnderlyingType()==t.PropertyType) ||
+                                      (t.PropertyType.IsNullable() && t.PropertyType.GetNullableUnderlyingType()==s.PropertyType)
                                   )
                               )
                           select new PropertyMap

@@ -191,7 +191,6 @@ async function httpPost(url: string, body: object, successMessage: string, isBod
         .then((response) => handleResponse(response, successMessage))
         .then((response) => response)
         .catch((error) => {
-            alert(error);
             toastFailure(error);
             throw error;
         });

@@ -43,6 +43,23 @@ public static class TypeExtensions
     }
 
     /// <summary>
+    /// Gets the underlying type of a nullable type
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
+    public static Type GetNullableUnderlyingType(this Type t) {
+        if (!t.IsNullable()) {
+            throw new Exception("Type is not a nullable type.");
+        }
+        var underlyingType = Nullable.GetUnderlyingType(t);
+        if (underlyingType==null){
+            throw new Exception("Underlying type is null.");
+        }
+        return underlyingType;
+    }
+
+    /// <summary>
     /// Supports a parse method for nullable types.
     /// </summary>
     /// <typeparam name="T"></typeparam>

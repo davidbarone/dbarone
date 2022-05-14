@@ -69,7 +69,6 @@ const loadCode = async (post:PostType) => {
             document.head.appendChild(script);
         } catch (e) {
             // option (b) for other browsers
-            alert('error');
             script.text = post.code;
             document.head.appendChild(script);
         }

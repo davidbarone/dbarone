@@ -1,6 +1,7 @@
 namespace dbarone_api.Entities;
 using dbarone_api.Lib.Data;
 using dbarone_api.Lib.Validation;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Type type of post content.
@@ -79,6 +80,7 @@ public class Post
     /// </summary>
     
     [Column("PostType", EnumColumnBehaviour=EnumColumnBehaviourEnum.STRING)]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public PostType PostType { get; set; } = PostType.HTML;
 
     /// <summary>

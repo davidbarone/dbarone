@@ -1,5 +1,6 @@
 namespace dbarone_api.Lib.ObjectMapper;
 using System.Reflection;
+using dbarone_api.Extensions;
 
 public class ObjectMapper<T, U> where T : class where U : class
 {
@@ -36,7 +37,34 @@ public class ObjectMapper<T, U> where T : class where U : class
         {
             var prop = _map[i];
             var sourceValue = prop.SourceProperty.GetValue(obj, null);
-            prop.TargetProperty.SetValue(target, sourceValue, null);
+
+            if (sourceValue == null)
+            {
+                // null value
+                prop.TargetProperty.SetValue(target, null);
+            }
+            else if (prop.TargetProperty.PropertyType == prop.SourceProperty.PropertyType)
+            {
+                // source & target same type
+                prop.TargetProperty.SetValue(target, sourceValue, null);
+            }
+            else if (prop.TargetProperty.PropertyType == typeof(string))
+            {
+                // target is string - do ToString()
+                prop.TargetProperty.SetValue(target, sourceValue?.ToString(), null);
+            }
+            else if (prop.TargetProperty.PropertyType.IsEnum && prop.SourceProperty.PropertyType == typeof(string))
+            {
+                // source is string & target is enum
+                prop.TargetProperty.SetValue(target, Enum.Parse(prop.TargetProperty.PropertyType, (String)sourceValue), null);
+            } else if (prop.SourceProperty.PropertyType.IsNullable() && prop.SourceProperty.PropertyType.GetNullableUnderlyingType()==prop.TargetProperty.PropertyType)
+            {
+                if (sourceValue==null){
+                    prop.TargetProperty.SetValue(target, prop.TargetProperty.PropertyType.Default());
+                } else {
+                    prop.TargetProperty.SetValue(target, sourceValue, null);
+                }
+            }
         }
         return target;
     }
