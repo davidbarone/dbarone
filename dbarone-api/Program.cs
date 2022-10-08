@@ -78,20 +78,22 @@ var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
 // add hardcoded test user to db on startup
+/*
 using (var scope = app.Services.CreateScope())
 {
     var dataService = scope.ServiceProvider.GetRequiredService<IDataService>();
     var testUser = new UserRequest
     {
-        FirstName = "David",
-        LastName = "Barone",
-        Username = "dbarone",
-        Password = "sa12()PO",
-        Email = "davidbarone@live.com"
+        FirstName = "<enter firstname>",
+        LastName = "<enter lastname>",
+        Username = "<enter user name>",
+        Password = "<enter password>",
+        Email = "<enter email>"
     };
 
     dataService.CreateUser(testUser);
 }
+*/
 
 {
     // Configure the HTTP request pipeline.

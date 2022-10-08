@@ -40,7 +40,7 @@ public class PostController : RestController
         if (pageSize < 1) pageSize = 1;
         if (page < 1) page = 1;
         var mapper = ObjectMapper<Post, PostSummaryResponse>.Create();
-        var posts = mapper.MapMany(_dataService.Context.Read<Post>().Where(p => !p.IsChild));
+        var posts = mapper.MapMany(_dataService.Context.Read<Post>().Where(p => !p.IsChild).OrderByDescending(p=>p.CreatedDt));
         return Ok(posts.ToResponseEnvelope(Url, this.GetPosts, pageSize, page));
     }
 
