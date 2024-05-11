@@ -108,7 +108,7 @@ const PostRoute: FunctionComponent<PostProps> = ({ id }) => {
             <ButtonWidget href='/posts' label="Posts"></ButtonWidget>
             <div
                 style={{ marginTop: '6px' }}
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: post.contentHtml }}
             ></div>
             <ViewCommentsComponent postId={id} comments={post.comments}></ViewCommentsComponent>
             {/* Slider for creating new posts */}

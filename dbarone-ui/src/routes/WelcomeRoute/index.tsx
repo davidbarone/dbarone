@@ -7,8 +7,7 @@ const WelcomeRoute: FunctionComponent = () => {
             <section>
                 <div className={style.blockquoteContainer}>
                     <blockquote cite="https://www.dbarone.com/">
-                        <p>People often ask me: "David, what's your greatest contribution to the Business Intelligence world?"</p>
-                        <p>I tell them "I'm good with colors. I use a lot of them in my charts".</p>
+                        <p>Developer and business intelligence lead, living on the Australian NSW Central Coast.</p>
                         <cite>
                             <a href="https://www.dbarone.com">David Barone</a>
                         </cite>

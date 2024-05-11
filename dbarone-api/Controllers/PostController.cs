@@ -50,18 +50,9 @@ public class PostController : RestController
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("/posts/{id}")]
-    public ActionResult<ResponseEnvelope<Post>> GetPost(int id)
+    public ActionResult<ResponseEnvelope<PostHtml>> GetPost(int id)
     {
-        var post = _dataService.Context.Find<Post>(id);
-
-        // Convert markdown to html?
-        if (post.PostType == PostType.MARKDOWN)
-        {
-            var pipeline = new MarkdownPipelineBuilder()
-                .UseAdvancedExtensions()
-                .Build();
-            post.Content = Markdown.ToHtml(post.Content, pipeline);
-        }
+        var post = _dataService.Context.Find<PostHtml>(id);
 
         var links = new Link[] {
             Url.GetLink("Related", this.GetRelatedPosts, new { id = id }),
@@ -77,9 +68,9 @@ public class PostController : RestController
     /// <param name="slug"></param>
     /// <returns></returns>
     [HttpGet("/{slug}")]
-    public ActionResult<ResponseEnvelope<Post>> GetPostBySlug(string slug)
+    public ActionResult<ResponseEnvelope<PostHtml>> GetPostBySlug(string slug)
     {
-        var entity = _dataService.Context.Single<Post>(new { Slug = slug });
+        var entity = _dataService.Context.Single<PostHtml>(new { Slug = slug });
         return GetPost(entity.Id);
     }
 

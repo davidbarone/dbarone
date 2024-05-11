@@ -2,6 +2,7 @@ namespace dbarone_api.Entities;
 using dbarone_api.Lib.Data;
 using dbarone_api.Lib.Validation;
 using System.Text.Json.Serialization;
+using Markdig;
 
 /// <summary>
 /// Type type of post content.
@@ -51,7 +52,7 @@ public class Post
     public string? Teaser { get; set; } = string.Empty;
 
     /// <summary>
-    /// The post main body content.
+    /// The post main body content. Is always rendered as HTML.
     /// </summary>
     [RequiredValidator]
     [StringLengthValidator(Min = 1, Max = Int16.MaxValue)]
@@ -78,8 +79,8 @@ public class Post
     /// <summary>
     /// The post type of content.
     /// </summary>
-    
-    [Column("PostType", EnumColumnBehaviour=EnumColumnBehaviourEnum.STRING)]
+
+    [Column("PostType", EnumColumnBehaviour = EnumColumnBehaviourEnum.STRING)]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public PostType PostType { get; set; } = PostType.HTML;
 
@@ -117,4 +118,34 @@ public class Post
     /// </summary>
     [NotMapped]
     public bool IsChild => this.ParentId != null;
+}
+
+/// <summary>
+/// Version of the post used for rendering. Includes a ContentHtml property.
+/// </summary>
+[Table("Post")]
+public class PostHtml : Post
+{
+    /// <summary>
+    /// The formatted content. Returns markdown or HTML.
+    /// </summary>
+    public string ContentHtml
+    {
+        get
+        {
+            // Convert markdown to html?
+            if (this.PostType == PostType.MARKDOWN)
+            {
+                var pipeline = new MarkdownPipelineBuilder()
+                    .UseAdvancedExtensions()
+                    .Build();
+                return Markdown.ToHtml(this.Content, pipeline);
+            }
+            else
+            {
+                return this.Content;
+            }
+        }
+    }
+
 }
